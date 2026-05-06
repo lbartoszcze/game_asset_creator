@@ -1,8 +1,15 @@
 const RACE_COLORS = {
-  humans:    { bg1: '#3a4a6a', bg2: '#0c1226', stroke: '#d6a93f', tint: '0.97 0.81 0.42' },
-  dwarves:   { bg1: '#4a3a2a', bg2: '#1a0f08', stroke: '#c4844a', tint: '0.95 0.68 0.42' },
-  elves:     { bg1: '#1f4a3a', bg2: '#06160d', stroke: '#a8e8b8', tint: '0.78 0.96 0.82' },
-  skeletons: { bg1: '#2a1a3a', bg2: '#0a0518', stroke: '#b88dff', tint: '0.85 0.72 1.00' },
+  humans:    { bg1: '#3a4a6a', bg2: '#0c1226', stroke: '#d6a93f', tint: '0.97 0.81 0.42', scene: 'castle' },
+  dwarves:   { bg1: '#4a3a2a', bg2: '#1a0f08', stroke: '#c4844a', tint: '0.95 0.68 0.42', scene: 'peaks' },
+  elves:     { bg1: '#1f4a3a', bg2: '#06160d', stroke: '#a8e8b8', tint: '0.78 0.96 0.82', scene: 'forest' },
+  skeletons: { bg1: '#2a1a3a', bg2: '#0a0518', stroke: '#b88dff', tint: '0.85 0.72 1.00', scene: 'ruins' },
+};
+
+const SCENES = {
+  castle: '<path d="M0 92 L0 78 L8 78 L8 72 L14 72 L14 80 L22 80 L22 70 L30 66 L38 70 L38 78 L46 78 L46 64 L54 64 L54 78 L62 78 L62 70 L70 66 L78 70 L78 80 L86 80 L86 72 L92 72 L92 78 L100 78 L100 92 Z" fill="#000" opacity="0.32"/><rect x="28" y="68" width="2" height="6" fill="#000" opacity="0.32"/><rect x="68" y="68" width="2" height="6" fill="#000" opacity="0.32"/>',
+  peaks:  '<path d="M0 92 L0 84 L14 70 L24 80 L36 60 L48 76 L58 64 L70 78 L82 58 L94 76 L100 70 L100 92 Z" fill="#000" opacity="0.32"/><path d="M32 64 L36 60 L40 64 Z" fill="#fff" opacity="0.18"/><path d="M78 62 L82 58 L86 62 Z" fill="#fff" opacity="0.18"/>',
+  forest: '<path d="M0 92 L0 78 L4 78 L8 72 L12 78 L16 70 L20 78 L26 68 L32 78 L36 72 L40 78 L46 66 L52 78 L58 72 L62 78 L68 70 L74 78 L80 72 L84 78 L90 68 L96 78 L100 78 L100 92 Z" fill="#000" opacity="0.32"/><line x1="20" y1="78" x2="20" y2="86" stroke="#000" stroke-width="0.5" opacity="0.4"/><line x1="46" y1="78" x2="46" y2="86" stroke="#000" stroke-width="0.5" opacity="0.4"/><line x1="74" y1="78" x2="74" y2="86" stroke="#000" stroke-width="0.5" opacity="0.4"/>',
+  ruins:  '<path d="M0 92 L0 70 L8 70 L8 80 L18 80 L18 64 L26 64 L26 80 L40 80 L40 72 L48 72 L48 80 L60 80 L60 60 L68 60 L68 80 L78 80 L78 76 L92 76 L92 80 L100 80 L100 92 Z" fill="#000" opacity="0.32"/><rect x="20" y="68" width="2" height="4" fill="#000" opacity="0.5"/><rect x="62" y="64" width="2" height="6" fill="#000" opacity="0.5"/>',
 };
 const TIER_GLOW = { common: '#bdbdbd', combo: '#6cd6ff', rare: '#b88dff' };
 
@@ -85,8 +92,9 @@ export function cardArtSvg(card, race) {
   const key = pickGlyph(card);
   const useImage = G[key] !== undefined;
   const glyph = useImage
-    ? `<image href="${ART_BASE}/${key}.svg" x="14" y="14" width="72" height="72" preserveAspectRatio="xMidYMid meet" filter="url(#tint-${u})"/>`
+    ? `<image href="${ART_BASE}/${key}.svg" x="6" y="6" width="88" height="88" preserveAspectRatio="xMidYMid meet" filter="url(#tint-${u})"/>`
     : (G.sword).replaceAll('~U~', u);
+  const scene = SCENES[c.scene] || '';
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
   <defs>
     <linearGradient id="bg-${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${c.bg1}"/><stop offset="100%" stop-color="${c.bg2}"/></linearGradient>
@@ -100,7 +108,9 @@ export function cardArtSvg(card, race) {
     <linearGradient id="lf-${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7be08a"/><stop offset="100%" stop-color="#1a4a2a"/></linearGradient>
     <radialGradient id="dr-${u}" cx="0.4" cy="0.35" r="0.7"><stop offset="0%" stop-color="#e0f8ff"/><stop offset="100%" stop-color="#0a4060"/></radialGradient>
     <radialGradient id="vig-${u}" cx="0.5" cy="0.5" r="0.72"><stop offset="55%" stop-color="${c.bg2}" stop-opacity="0"/><stop offset="100%" stop-color="${c.bg2}" stop-opacity="0.7"/></radialGradient>
-    <filter id="tint-${u}" x="0" y="0" width="100%" height="100%"><feColorMatrix type="matrix" values="${c.tint.split(' ')[0]} 0 0 0 0  0 ${c.tint.split(' ')[1]} 0 0 0  0 0 ${c.tint.split(' ')[2]} 0 0  0 0 0 1 0"/><feGaussianBlur stdDeviation="0.3"/></filter>
+    <filter id="parch-${u}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="${cnt}"/><feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+    <filter id="tint-${u}" x="-5%" y="-5%" width="110%" height="110%"><feColorMatrix type="matrix" values="${c.tint.split(' ')[0]} 0 0 0 0  0 ${c.tint.split(' ')[1]} 0 0 0  0 0 ${c.tint.split(' ')[2]} 0 0  0 0 0 1 0"/><feGaussianBlur stdDeviation="0.25"/><feDropShadow dx="0" dy="1.2" stdDeviation="1.4" flood-color="#000" flood-opacity="0.7"/></filter>
+    <filter id="glow-${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/><feColorMatrix type="matrix" values="0 0 0 0 ${parseInt(glow.slice(1,3),16)/255}  0 0 0 0 ${parseInt(glow.slice(3,5),16)/255}  0 0 0 0 ${parseInt(glow.slice(5,7),16)/255}  0 0 0 0.6 0"/></filter>
   </defs>
   <rect width="100" height="100" rx="6" fill="${c.bg2}"/>
   <rect x="2" y="2" width="96" height="96" rx="5" fill="url(#bg-${u})"/>
@@ -111,6 +121,8 @@ export function cardArtSvg(card, race) {
   <path d="M2 98 L16 98 L2 84 Z" fill="${c.stroke}" opacity="0.5"/>
   <path d="M98 98 L84 98 L98 84 Z" fill="${c.stroke}" opacity="0.5"/>
   <path d="M0 4 L16 4" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M84 4 L100 4" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M0 96 L16 96" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M84 96 L100 96" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/>
+  ${scene}
+  <rect x="2" y="2" width="96" height="96" rx="5" fill="#fff" filter="url(#parch-${u})"/>
   <circle cx="50" cy="48" r="38" fill="url(#halo-${u})"/>
   <circle cx="50" cy="48" r="22" fill="${glow}" opacity="0.10"/>
   ${glyph}
