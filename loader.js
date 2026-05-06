@@ -42,10 +42,13 @@ export function buildRaceUnit(raceKey, team) {
   const inner = SkeletonUtils.clone(proto.scene);
   const innerBbox = new THREE.Box3().setFromObject(inner);
   const innerCenter = innerBbox.getCenter(new THREE.Vector3());
+  const innerSize = innerBbox.getSize(new THREE.Vector3());
   inner.position.sub(innerCenter);
-  inner.position.y += (innerBbox.max.y - innerBbox.min.y) / 2;
   const root = new THREE.Group();
   root.add(inner);
+  if (innerSize.y < innerSize.x * 0.6 && innerSize.y < innerSize.z * 0.6) root.rotation.x = -Math.PI / 2;
+  const rootBbox = new THREE.Box3().setFromObject(root);
+  root.position.y -= rootBbox.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
