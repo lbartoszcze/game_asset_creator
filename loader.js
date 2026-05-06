@@ -42,6 +42,20 @@ export function buildRaceUnit(raceKey, team) {
   const inner = SkeletonUtils.clone(proto.scene);
   const root = new THREE.Group();
   root.add(inner);
+  let hasSkinned = false;
+  inner.traverse((m) => { if (m.isSkinnedMesh) hasSkinned = true; });
+  if (!hasSkinned) {
+    const ib = new THREE.Box3().setFromObject(inner);
+    const sz = ib.getSize(new THREE.Vector3());
+    if (sz.y < sz.x * 0.6 && sz.y < sz.z * 0.6) inner.rotation.x = -Math.PI / 2;
+    const ib2 = new THREE.Box3().setFromObject(inner);
+    const sz2 = ib2.getSize(new THREE.Vector3());
+    const h = Math.max(sz2.y, sz2.x, sz2.z);
+    if (h > 0) inner.scale.setScalar(2 / h);
+    const ib3 = new THREE.Box3().setFromObject(inner);
+    const ic = ib3.getCenter(new THREE.Vector3());
+    inner.position.x -= ic.x; inner.position.z -= ic.z; inner.position.y -= ib3.min.y;
+  }
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
