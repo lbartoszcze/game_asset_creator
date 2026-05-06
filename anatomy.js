@@ -97,8 +97,11 @@ function buildShieldArm(team, raceKey, liveryMat, skinMat, accentMat, weaponStyl
   upper.position.set(0.05, -0.50, 0); upper.castShadow = true;
   const bicep = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), liveryMat);
   bicep.position.set(0.05, -0.18, 0.05); bicep.scale.set(1.0, 0.9, 0.7); bicep.castShadow = true;
-  const fore = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.10, 0.32, 12), skinMat);
+  const fore = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.10, 0.32, 16), skinMat);
   fore.position.set(0.05, -0.74, 0); fore.castShadow = true;
+  const bracer = new THREE.Mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.20, 16), lambert(0x707378, true));
+  bracer.position.set(0.05, -0.78, 0); bracer.castShadow = true;
+  const bracerStrap = new THREE.Mesh(new THREE.TorusGeometry(0.115, 0.012, 6, 14), lambert(0x3a2a1a)); bracerStrap.position.set(0.05, -0.70, 0); bracerStrap.rotation.x = Math.PI / 2;
   const hand = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.10, 0.18), skinMat);
   hand.position.set(0.05, -0.92, 0.05); hand.castShadow = true;
   const fingerMat = skinMat;
@@ -111,7 +114,7 @@ function buildShieldArm(team, raceKey, liveryMat, skinMat, accentMat, weaponStyl
   shieldDisc.position.set(-0.08, -0.92, 0.10); shieldDisc.rotation.z = Math.PI / 2; shieldDisc.castShadow = true;
   const sboss = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 10), accentMat); sboss.position.set(-0.13, -0.92, 0.10);
   const rim = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.025, 8, 24), accentMat); rim.position.set(-0.10, -0.92, 0.10); rim.rotation.y = Math.PI / 2;
-  arm.add(upper, bicep, fore, hand, shieldDisc, sboss, rim);
+  arm.add(upper, bicep, fore, bracer, bracerStrap, hand, shieldDisc, sboss, rim);
   if (twoHand) { shieldDisc.visible = false; sboss.visible = false; rim.visible = false; arm.rotation.y = -0.55; }
   arm.userData.twoHand = twoHand;
   return arm;
