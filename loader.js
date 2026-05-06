@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
-import { SkeletonUtils } from 'https://unpkg.com/three@0.160.0/examples/jsm/utils/SkeletonUtils.js';
+import * as SkeletonUtils from 'https://unpkg.com/three@0.160.0/examples/jsm/utils/SkeletonUtils.js';
 
 const SOLDIER_URL = 'https://threejs.org/examples/models/gltf/Soldier.glb';
 
