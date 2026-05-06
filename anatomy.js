@@ -98,17 +98,11 @@ function buildTorso(team, liveryMat, accentMat, beltMat, skinMat) {
   const shoulderL = new THREE.Mesh(new THREE.SphereGeometry(0.20, 14, 10), liveryMat); shoulderL.position.set(-0.42, 1.78, 0); shoulderL.castShadow = true;
   const shoulderR = new THREE.Mesh(new THREE.SphereGeometry(0.20, 14, 10), liveryMat); shoulderR.position.set( 0.42, 1.78, 0); shoulderR.castShadow = true;
   const collar = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.06, 0.10), accentMat); collar.position.set(0, 1.80, 0.18);
-  const pecL = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), liveryMat); pecL.position.set(-0.16, 1.55, 0.30); pecL.scale.set(1.0, 0.7, 0.7); pecL.castShadow = true;
-  const pecR = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), liveryMat); pecR.position.set( 0.16, 1.55, 0.30); pecR.scale.set(1.0, 0.7, 0.7); pecR.castShadow = true;
-  const abMat = lambert(0x6a4a2a, true);
-  for (const [dy, sy] of [[0, 1.0], [-0.08, 0.95], [-0.16, 0.90], [-0.24, 0.85]]) {
-    const seg = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.04, 0.06), abMat); seg.position.set(0, 1.32 + dy, 0.36); seg.scale.set(sy, 1, 1); g.add(seg);
-  }
   const belt = new THREE.Mesh(new THREE.TorusGeometry(0.40, 0.06, 8, 20), beltMat); belt.rotation.x = Math.PI / 2; belt.position.y = 0.95;
   const buckle = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.10, 0.06), accentMat); buckle.position.set(0, 0.95, 0.42);
   const pouchL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.16, 0.10), beltMat); pouchL.position.set(-0.30, 0.85, 0.30);
   const scabbard = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.65, 0.10), beltMat); scabbard.position.set(-0.42, 0.55, 0); scabbard.rotation.z = -0.15;
-  g.add(torso, shoulderL, shoulderR, collar, pecL, pecR, belt, buckle, pouchL, scabbard);
+  g.add(torso, shoulderL, shoulderR, collar, belt, buckle, pouchL, scabbard);
   return g;
 }
 
@@ -185,14 +179,9 @@ function buildCape(accentMat) {
     seg.rotation.y = a; seg.rotation.x = -0.06;
     g.add(seg);
   }
-  const mantleMat = new THREE.MeshLambertMaterial({ color: accentMat.color, side: THREE.DoubleSide });
-  for (let i = 0; i < 9; i++) {
-    const a = -Math.PI / 2 + (i / 8) * Math.PI;
-    const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.36), mantleMat);
-    seg.position.set(Math.cos(a) * 0.42, 1.78, Math.sin(a) * 0.42);
-    seg.rotation.y = -a + Math.PI / 2; seg.rotation.x = 0.12;
-    g.add(seg);
-  }
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.36, 18, 12, 0, Math.PI, 0, Math.PI / 2), capeMat);
+  hood.position.set(0, 1.85, -0.10); hood.rotation.x = -0.30;
+  g.add(hood);
   return g;
 }
 
