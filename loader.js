@@ -42,20 +42,6 @@ export function buildRaceUnit(raceKey, team) {
   const inner = SkeletonUtils.clone(proto.scene);
   const root = new THREE.Group();
   root.add(inner);
-  const preBbox = new THREE.Box3().setFromObject(inner);
-  const preSize = preBbox.getSize(new THREE.Vector3());
-  if (preSize.y < preSize.x * 0.6 && preSize.y < preSize.z * 0.6) root.rotation.x = -Math.PI / 2;
-  const orientedBbox = new THREE.Box3().setFromObject(root);
-  const orientedSize = orientedBbox.getSize(new THREE.Vector3());
-  const targetH = 2.0;
-  const measured = orientedSize.y > 0 ? orientedSize.y : Math.max(orientedSize.x, orientedSize.z);
-  const s = measured > 0 ? targetH / measured : 1;
-  root.scale.setScalar(s);
-  const bbox2 = new THREE.Box3().setFromObject(root);
-  const c = bbox2.getCenter(new THREE.Vector3());
-  root.position.x = -c.x;
-  root.position.z = -c.z;
-  root.position.y = -bbox2.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
