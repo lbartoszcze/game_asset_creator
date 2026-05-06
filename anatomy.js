@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { MarchingCubes } from 'https://unpkg.com/three@0.160.0/examples/jsm/objects/MarchingCubes.js';
 import { buildWeaponArm, buildArmorTier } from '../lib/weapons.js';
 
 const lambert = (color, flat = false) => new THREE.MeshLambertMaterial({ color, flatShading: flat });
@@ -18,6 +19,51 @@ const TORSO_PROFILE = [[0.34, 0.00], [0.42, 0.10], [0.48, 0.30], [0.46, 0.50], [
 function lathe(profile, segments = 32) {
   const pts = profile.map(([x, y]) => new THREE.Vector2(x, y));
   return new THREE.LatheGeometry(pts, segments);
+}
+
+const BLOB_RIG = [
+  [0.50, 0.92, 0.50, 0.42, 'head'],
+  [0.50, 0.81, 0.50, 0.20, 'neck'],
+  [0.36, 0.78, 0.50, 0.30, 'shL'], [0.64, 0.78, 0.50, 0.30, 'shR'],
+  [0.30, 0.68, 0.50, 0.26, 'biL'], [0.70, 0.68, 0.50, 0.26, 'biR'],
+  [0.27, 0.58, 0.50, 0.22, 'elL'], [0.73, 0.58, 0.50, 0.22, 'elR'],
+  [0.26, 0.48, 0.50, 0.20, 'foL'], [0.74, 0.48, 0.50, 0.20, 'foR'],
+  [0.50, 0.74, 0.50, 0.42, 'chestU'],
+  [0.50, 0.66, 0.50, 0.40, 'chestM'],
+  [0.50, 0.58, 0.50, 0.36, 'abs'],
+  [0.50, 0.50, 0.50, 0.40, 'hips'],
+  [0.42, 0.42, 0.50, 0.30, 'thL'], [0.58, 0.42, 0.50, 0.30, 'thR'],
+  [0.42, 0.32, 0.50, 0.26, 'knL'], [0.58, 0.32, 0.50, 0.26, 'knR'],
+  [0.42, 0.22, 0.50, 0.24, 'caL'], [0.58, 0.22, 0.50, 0.24, 'caR'],
+  [0.42, 0.12, 0.50, 0.22, 'fL'],  [0.58, 0.12, 0.50, 0.22, 'fR'],
+];
+
+function generateSkinTexture(skinHex, accentHex, w = 256, h = 512) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#' + skinHex.toString(16).padStart(6, '0'); ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#' + accentHex.toString(16).padStart(6, '0');
+  ctx.fillRect(0, h * 0.55, w, h * 0.20);
+  ctx.fillRect(0, h * 0.42, w, h * 0.04);
+  ctx.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let i = 0; i < 800; i++) ctx.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 2, 1 + Math.random() * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  for (let i = 0; i < 400; i++) ctx.fillRect(Math.random() * w, Math.random() * h, 1, 1);
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; return tex;
+}
+
+export function buildBlobBody(skinHex, accentHex, resolution = 56, isolation = 80) {
+  const tex = generateSkinTexture(skinHex, accentHex);
+  const mat = new THREE.MeshLambertMaterial({ map: tex });
+  const mc = new MarchingCubes(resolution, mat, true, true, 200000);
+  mc.position.set(0, 1.0, 0);
+  mc.scale.setScalar(2.4);
+  mc.isolation = isolation;
+  mc.reset();
+  for (const [x, y, z, str] of BLOB_RIG) mc.addBall(x, y, z, str, 12);
+  mc.update();
+  mc.castShadow = true;
+  return mc;
 }
 
 function buildHead(v, raceKey, skinMat, boneMat, eyeMat) {
