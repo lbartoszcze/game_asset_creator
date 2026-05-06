@@ -29,7 +29,7 @@ export function isHumanoidReady() { return PROTOTYPE != null; }
 export function buildHumanoidUnit(team) {
   if (!PROTOTYPE) return null;
   const root = SkeletonUtils.clone(PROTOTYPE.scene);
-  root.scale.setScalar(3.0);
+  root.scale.setScalar(6.0);
   const bbox = new THREE.Box3().setFromObject(root);
   root.position.y = -bbox.min.y;
   root.traverse((m) => {
