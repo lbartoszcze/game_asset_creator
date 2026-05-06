@@ -29,12 +29,17 @@ export function isHumanoidReady() { return PROTOTYPE != null; }
 export function buildHumanoidUnit(team) {
   if (!PROTOTYPE) return null;
   const root = SkeletonUtils.clone(PROTOTYPE.scene);
-  root.scale.setScalar(2.5);
+  root.scale.setScalar(1.0);
   const bbox = new THREE.Box3().setFromObject(root);
   if (bbox.min.y < 0) root.position.y = -bbox.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
+      if (m.geometry) {
+        m.geometry.computeBoundingBox();
+        m.geometry.computeBoundingSphere();
+        if (m.geometry.boundingSphere) m.geometry.boundingSphere.radius *= 3;
+      }
       const mat = m.material.clone();
       if (team && team.livery && mat.color) {
         const tint = new THREE.Color(team.livery);
