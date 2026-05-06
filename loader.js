@@ -50,7 +50,10 @@ export function buildRaceUnit(raceKey, team) {
   const s = measured > 0 ? targetH / measured : 1;
   root.scale.setScalar(s);
   const bbox2 = new THREE.Box3().setFromObject(root);
-  if (bbox2.min.y !== 0) root.position.y = -bbox2.min.y;
+  const c = bbox2.getCenter(new THREE.Vector3());
+  root.position.x = -c.x;
+  root.position.z = -c.z;
+  root.position.y = -bbox2.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
