@@ -2,33 +2,44 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'https://unpkg.com/three@0.160.0/examples/jsm/utils/SkeletonUtils.js';
 
-const SOLDIER_URL = 'https://threejs.org/examples/models/gltf/Soldier.glb';
+const RACE_MODELS = {
+  humans:    new URL('./models/humans.glb', import.meta.url).href,
+  dwarves:   new URL('./models/dwarves.glb', import.meta.url).href,
+  elves:     new URL('./models/elves.glb', import.meta.url).href,
+  skeletons: new URL('./models/skeletons.glb', import.meta.url).href,
+};
 
-let PROTOTYPE = null;
-let LOAD_PROMISE = null;
+const PROTOTYPES = {};
+const LOAD_PROMISES = {};
 
-export function loadHumanoid() {
-  if (PROTOTYPE) return Promise.resolve(PROTOTYPE);
-  if (LOAD_PROMISE) return LOAD_PROMISE;
+export function loadRaceModel(raceKey) {
+  if (PROTOTYPES[raceKey]) return Promise.resolve(PROTOTYPES[raceKey]);
+  if (LOAD_PROMISES[raceKey]) return LOAD_PROMISES[raceKey];
+  const url = RACE_MODELS[raceKey];
+  if (!url) return Promise.reject(new Error('no model for ' + raceKey));
   const loader = new GLTFLoader();
-  LOAD_PROMISE = new Promise((resolve, reject) => {
-    loader.load(SOLDIER_URL, (gltf) => {
+  LOAD_PROMISES[raceKey] = new Promise((resolve, reject) => {
+    loader.load(url, (gltf) => {
       gltf.scene.traverse((m) => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true; } });
-      PROTOTYPE = gltf;
+      PROTOTYPES[raceKey] = gltf;
       resolve(gltf);
-    }, undefined, (err) => {
-      console.warn('[loader] humanoid load failed', err);
-      reject(err);
-    });
+    }, undefined, (err) => { console.warn('[loader] ' + raceKey + ' failed', err); reject(err); });
   });
-  return LOAD_PROMISE;
+  return LOAD_PROMISES[raceKey];
 }
 
-export function isHumanoidReady() { return PROTOTYPE != null; }
+export function loadAllRaces() {
+  return Promise.all(Object.keys(RACE_MODELS).map((r) => loadRaceModel(r).catch(() => null)));
+}
 
-export function buildHumanoidUnit(team) {
-  if (!PROTOTYPE) return null;
-  const root = SkeletonUtils.clone(PROTOTYPE.scene);
+export function loadHumanoid() { return loadRaceModel('humans'); }
+export function isHumanoidReady() { return PROTOTYPES.humans != null; }
+export function isRaceReady(raceKey) { return PROTOTYPES[raceKey] != null; }
+
+export function buildRaceUnit(raceKey, team) {
+  const proto = PROTOTYPES[raceKey];
+  if (!proto) return null;
+  const root = SkeletonUtils.clone(proto.scene);
   root.scale.setScalar(1.0);
   const bbox = new THREE.Box3().setFromObject(root);
   if (bbox.min.y < 0) root.position.y = -bbox.min.y;
@@ -51,9 +62,11 @@ export function buildHumanoidUnit(team) {
   });
   const mixer = new THREE.AnimationMixer(root);
   const clips = {};
-  for (const c of PROTOTYPE.animations) clips[c.name] = c;
+  for (const c of proto.animations) clips[c.name] = c;
   return { root, mixer, clips };
 }
+
+export function buildHumanoidUnit(team) { return buildRaceUnit('humans', team); }
 
 export function playClip(unitGltf, name, opts = {}) {
   if (!unitGltf || !unitGltf.clips[name]) return null;
