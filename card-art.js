@@ -6,6 +6,8 @@ const RACE_COLORS = {
 };
 const TIER_GLOW = { common: '#bdbdbd', combo: '#6cd6ff', rare: '#b88dff' };
 
+const ART_BASE = (typeof window !== 'undefined' && window.CARD_ART_BASE) ? window.CARD_ART_BASE : 'art/cards';
+
 let cnt = 0;
 
 const G = {};
@@ -80,7 +82,11 @@ export function cardArtSvg(card, race) {
   const u = (++cnt).toString(36);
   const c = RACE_COLORS[race] || RACE_COLORS.humans;
   const glow = TIER_GLOW[card.tier] || '#888';
-  const glyph = (G[pickGlyph(card)] || G.sword).replaceAll('~U~', u);
+  const key = pickGlyph(card);
+  const useImage = G[key] !== undefined;
+  const glyph = useImage
+    ? `<image href="${ART_BASE}/${key}.png" x="8" y="8" width="84" height="80" preserveAspectRatio="xMidYMid meet"/>`
+    : (G.sword).replaceAll('~U~', u);
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
   <defs>
     <linearGradient id="bg-${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${c.bg1}"/><stop offset="100%" stop-color="${c.bg2}"/></linearGradient>
