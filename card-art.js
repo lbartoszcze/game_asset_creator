@@ -1,8 +1,8 @@
 const RACE_COLORS = {
-  humans:    { bg1: '#3a4a6a', bg2: '#0c1226', stroke: '#d6a93f' },
-  dwarves:   { bg1: '#4a3a2a', bg2: '#1a0f08', stroke: '#c4844a' },
-  elves:     { bg1: '#1f4a3a', bg2: '#06160d', stroke: '#a8e8b8' },
-  skeletons: { bg1: '#2a1a3a', bg2: '#0a0518', stroke: '#b88dff' },
+  humans:    { bg1: '#3a4a6a', bg2: '#0c1226', stroke: '#d6a93f', tint: '0.97 0.81 0.42' },
+  dwarves:   { bg1: '#4a3a2a', bg2: '#1a0f08', stroke: '#c4844a', tint: '0.95 0.68 0.42' },
+  elves:     { bg1: '#1f4a3a', bg2: '#06160d', stroke: '#a8e8b8', tint: '0.78 0.96 0.82' },
+  skeletons: { bg1: '#2a1a3a', bg2: '#0a0518', stroke: '#b88dff', tint: '0.85 0.72 1.00' },
 };
 const TIER_GLOW = { common: '#bdbdbd', combo: '#6cd6ff', rare: '#b88dff' };
 
@@ -85,7 +85,7 @@ export function cardArtSvg(card, race) {
   const key = pickGlyph(card);
   const useImage = G[key] !== undefined;
   const glyph = useImage
-    ? `<image href="${ART_BASE}/${key}.png" x="8" y="8" width="84" height="80" preserveAspectRatio="xMidYMid meet"/>`
+    ? `<image href="${ART_BASE}/${key}.svg" x="14" y="14" width="72" height="72" preserveAspectRatio="xMidYMid meet" filter="url(#tint-${u})"/>`
     : (G.sword).replaceAll('~U~', u);
   return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
   <defs>
@@ -100,6 +100,7 @@ export function cardArtSvg(card, race) {
     <linearGradient id="lf-${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7be08a"/><stop offset="100%" stop-color="#1a4a2a"/></linearGradient>
     <radialGradient id="dr-${u}" cx="0.4" cy="0.35" r="0.7"><stop offset="0%" stop-color="#e0f8ff"/><stop offset="100%" stop-color="#0a4060"/></radialGradient>
     <radialGradient id="vig-${u}" cx="0.5" cy="0.5" r="0.72"><stop offset="55%" stop-color="${c.bg2}" stop-opacity="0"/><stop offset="100%" stop-color="${c.bg2}" stop-opacity="0.7"/></radialGradient>
+    <filter id="tint-${u}" x="0" y="0" width="100%" height="100%"><feColorMatrix type="matrix" values="${c.tint.split(' ')[0]} 0 0 0 0  0 ${c.tint.split(' ')[1]} 0 0 0  0 0 ${c.tint.split(' ')[2]} 0 0  0 0 0 1 0"/><feGaussianBlur stdDeviation="0.3"/></filter>
   </defs>
   <rect width="100" height="100" rx="6" fill="${c.bg2}"/>
   <rect x="2" y="2" width="96" height="96" rx="5" fill="url(#bg-${u})"/>
