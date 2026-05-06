@@ -93,19 +93,28 @@ export function cardArtSvg(card, race) {
     <radialGradient id="fl-${u}" cx="0.5" cy="0.7" r="0.55"><stop offset="0%" stop-color="#fff5a0"/><stop offset="40%" stop-color="#ff9a30"/><stop offset="100%" stop-color="#7a1a08"/></radialGradient>
     <linearGradient id="lf-${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7be08a"/><stop offset="100%" stop-color="#1a4a2a"/></linearGradient>
     <radialGradient id="dr-${u}" cx="0.4" cy="0.35" r="0.7"><stop offset="0%" stop-color="#e0f8ff"/><stop offset="100%" stop-color="#0a4060"/></radialGradient>
+    <radialGradient id="vig-${u}" cx="0.5" cy="0.5" r="0.72"><stop offset="55%" stop-color="${c.bg2}" stop-opacity="0"/><stop offset="100%" stop-color="${c.bg2}" stop-opacity="0.7"/></radialGradient>
   </defs>
   <rect width="100" height="100" rx="6" fill="${c.bg2}"/>
   <rect x="2" y="2" width="96" height="96" rx="5" fill="url(#bg-${u})"/>
-  <path d="M2 2 L16 2 L2 16 Z" fill="${c.stroke}" opacity="0.42"/>
-  <path d="M98 2 L84 2 L98 16 Z" fill="${c.stroke}" opacity="0.42"/>
-  <path d="M2 98 L16 98 L2 84 Z" fill="${c.stroke}" opacity="0.42"/>
-  <path d="M98 98 L84 98 L98 84 Z" fill="${c.stroke}" opacity="0.42"/>
+  <circle cx="20" cy="22" r="0.6" fill="${c.stroke}" opacity="0.55"/><circle cx="78" cy="20" r="0.45" fill="${c.stroke}" opacity="0.45"/><circle cx="86" cy="44" r="0.5" fill="${c.stroke}" opacity="0.5"/><circle cx="14" cy="56" r="0.4" fill="${c.stroke}" opacity="0.45"/><circle cx="22" cy="84" r="0.55" fill="${c.stroke}" opacity="0.5"/><circle cx="80" cy="80" r="0.55" fill="${c.stroke}" opacity="0.5"/><circle cx="50" cy="14" r="0.5" fill="${glow}" opacity="0.55"/><circle cx="40" cy="86" r="0.4" fill="${c.stroke}" opacity="0.45"/>
+  <rect x="2" y="2" width="96" height="96" rx="5" fill="url(#vig-${u})"/>
+  <path d="M2 2 L16 2 L2 16 Z" fill="${c.stroke}" opacity="0.5"/>
+  <path d="M98 2 L84 2 L98 16 Z" fill="${c.stroke}" opacity="0.5"/>
+  <path d="M2 98 L16 98 L2 84 Z" fill="${c.stroke}" opacity="0.5"/>
+  <path d="M98 98 L84 98 L98 84 Z" fill="${c.stroke}" opacity="0.5"/>
+  <path d="M0 4 L16 4" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M84 4 L100 4" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M0 96 L16 96" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/><path d="M84 96 L100 96" stroke="${c.stroke}" stroke-width="0.5" opacity="0.6"/>
   <circle cx="50" cy="48" r="38" fill="url(#halo-${u})"/>
   <circle cx="50" cy="48" r="22" fill="${glow}" opacity="0.10"/>
   ${glyph}
+  <path d="M50 2 L57 9 L50 16 L43 9 Z" fill="${c.bg2}" stroke="${c.stroke}" stroke-width="0.7"/>
+  <circle cx="50" cy="9" r="2.2" fill="${glow}" stroke="${c.stroke}" stroke-width="0.4"/>
+  <circle cx="49.2" cy="8.2" r="0.7" fill="#fff" opacity="0.9"/>
   <rect x="1" y="1" width="98" height="98" rx="6" fill="none" stroke="${c.stroke}" stroke-width="1.5"/>
+  <rect x="2.2" y="2.2" width="95.6" height="95.6" rx="5" fill="none" stroke="#fff" stroke-width="0.3" opacity="0.25"/>
   <rect x="1" y="1" width="98" height="98" rx="6" fill="none" stroke="#000" stroke-width="0.4" opacity="0.5"/>
-  <circle cx="91" cy="91" r="3.6" fill="${glow}" stroke="${c.stroke}" stroke-width="0.7"/>
-  <circle cx="89.8" cy="89.8" r="1.3" fill="#fff" opacity="0.85"/>
+  <circle cx="91" cy="91" r="3.8" fill="${glow}" stroke="${c.stroke}" stroke-width="0.7"/>
+  <circle cx="91" cy="91" r="3.8" fill="none" stroke="#000" stroke-width="0.3" opacity="0.6"/>
+  <circle cx="89.8" cy="89.8" r="1.3" fill="#fff" opacity="0.9"/>
 </svg>`;
 }
