@@ -12,7 +12,7 @@ const RACE_VISUALS = {
 };
 
 const LEG_PROFILE = [[0.20, 0.00], [0.22, 0.05], [0.20, 0.16], [0.16, 0.30], [0.21, 0.42], [0.16, 0.56], [0.18, 0.65], [0.20, 0.78], [0.22, 0.90], [0.20, 1.00]];
-const ARM_PROFILE = [[0.10, 0.00], [0.12, 0.10], [0.16, 0.18], [0.13, 0.30], [0.10, 0.45], [0.09, 0.50]];
+const ARM_PROFILE = [[0.10, 0.00], [0.11, 0.10], [0.13, 0.20], [0.14, 0.32], [0.12, 0.42], [0.10, 0.50]];
 const TORSO_PROFILE = [[0.34, 0.00], [0.42, 0.10], [0.48, 0.30], [0.46, 0.50], [0.40, 0.65], [0.46, 0.80], [0.40, 0.85]];
 
 function lathe(profile, segments = 16) {
@@ -22,25 +22,25 @@ function lathe(profile, segments = 16) {
 
 function buildHead(v, raceKey, skinMat, boneMat, eyeMat) {
   const g = new THREE.Group();
-  const head = new THREE.Mesh(new THREE.SphereGeometry(raceKey === 'skeletons' ? 0.24 : 0.27, 24, 18), raceKey === 'skeletons' ? boneMat : skinMat);
-  head.position.y = 2.00; head.castShadow = true;
-  head.scale.set(1.0, 1.05, 0.92);
-  const brow = new THREE.Mesh(new THREE.BoxGeometry(0.30, 0.05, 0.08), raceKey === 'skeletons' ? boneMat : skinMat);
-  brow.position.set(0, 2.10, 0.21);
-  const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), raceKey === 'skeletons' ? boneMat : skinMat);
-  cheekL.position.set(-0.16, 1.93, 0.17); cheekL.scale.set(0.7, 0.5, 0.7);
-  const cheekR = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), raceKey === 'skeletons' ? boneMat : skinMat);
-  cheekR.position.set( 0.16, 1.93, 0.17); cheekR.scale.set(0.7, 0.5, 0.7);
-  const chin = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.10, 0.10), raceKey === 'skeletons' ? boneMat : skinMat);
-  chin.position.set(0, 1.78, 0.18);
-  const eyeGeom = new THREE.SphereGeometry(raceKey === 'skeletons' ? 0.06 : 0.04, 8, 8);
-  const eyeL = new THREE.Mesh(eyeGeom, eyeMat); eyeL.position.set(-0.10, 2.04, 0.22);
-  const eyeR = new THREE.Mesh(eyeGeom, eyeMat); eyeR.position.set( 0.10, 2.04, 0.22);
-  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.16, 6), raceKey === 'skeletons' ? boneMat : skinMat);
-  nose.position.set(0, 1.97, 0.27); nose.rotation.x = Math.PI / 2;
-  const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.02, 0.02), basic(0x4a2a18));
-  mouth.position.set(0, 1.84, 0.26);
-  g.add(head, brow, cheekL, cheekR, chin, eyeL, eyeR, nose, mouth);
+  const headMat = raceKey === 'skeletons' ? boneMat : skinMat;
+  const headR = raceKey === 'skeletons' ? 0.20 : 0.22;
+  const head = new THREE.Mesh(new THREE.SphereGeometry(headR, 28, 20), headMat);
+  head.position.y = 2.00; head.castShadow = true; head.scale.set(1.0, 1.10, 0.94);
+  const brow = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.05, 0.07), headMat); brow.position.set(0, 2.07, 0.18);
+  const browL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.025, 0.04), basic(0x3a2010)); browL.position.set(-0.08, 2.09, 0.21);
+  const browR = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.025, 0.04), basic(0x3a2010)); browR.position.set( 0.08, 2.09, 0.21);
+  const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), headMat); cheekL.position.set(-0.14, 1.94, 0.15); cheekL.scale.set(0.7, 0.5, 0.7);
+  const cheekR = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), headMat); cheekR.position.set( 0.14, 1.94, 0.15); cheekR.scale.set(0.7, 0.5, 0.7);
+  const chin = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.08, 0.09), headMat); chin.position.set(0, 1.82, 0.16);
+  const eyeGeom = new THREE.SphereGeometry(raceKey === 'skeletons' ? 0.05 : 0.035, 10, 8);
+  const eyeL = new THREE.Mesh(eyeGeom, eyeMat); eyeL.position.set(-0.08, 2.02, 0.19);
+  const eyeR = new THREE.Mesh(eyeGeom, eyeMat); eyeR.position.set( 0.08, 2.02, 0.19);
+  const nose = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.14, 8), headMat);
+  nose.position.set(0, 1.97, 0.24); nose.rotation.x = Math.PI / 2;
+  const lipsMat = basic(0x6a2010);
+  const upperLip = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.02, 0.03), lipsMat); upperLip.position.set(0, 1.88, 0.22);
+  const lowerLip = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.025, 0.03), lipsMat); lowerLip.position.set(0, 1.86, 0.22);
+  g.add(head, brow, browL, browR, cheekL, cheekR, chin, eyeL, eyeR, nose, upperLip, lowerLip);
   if (v.hair && raceKey !== 'skeletons' && v.capH === 0) {
     const hairMat = lambert(v.hair, true);
     for (const [dx, dz] of [[0, 0], [-0.14, 0], [0.14, 0], [0, -0.14], [0, 0.14]]) {
@@ -93,10 +93,10 @@ function buildShieldArm(team, raceKey, liveryMat, skinMat, accentMat, weaponStyl
   const TWO_HAND = new Set(['spear', 'pike', 'halberd', 'lance']);
   const twoHand = TWO_HAND.has(weaponStyle);
   const arm = new THREE.Group(); arm.position.set(-0.50, 1.65, 0);
-  const upper = new THREE.Mesh(lathe(ARM_PROFILE, 12), liveryMat);
-  upper.position.set(0.05, -0.50, 0); upper.castShadow = true; upper.rotation.z = Math.PI;
-  const bicep = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 10), liveryMat);
-  bicep.position.set(0.05, -0.30, 0.05); bicep.scale.set(1.0, 0.9, 0.7); bicep.castShadow = true;
+  const upper = new THREE.Mesh(lathe(ARM_PROFILE, 14), liveryMat);
+  upper.position.set(0.05, -0.50, 0); upper.castShadow = true;
+  const bicep = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 12), liveryMat);
+  bicep.position.set(0.05, -0.18, 0.05); bicep.scale.set(1.0, 0.9, 0.7); bicep.castShadow = true;
   const fore = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.10, 0.32, 12), skinMat);
   fore.position.set(0.05, -0.74, 0); fore.castShadow = true;
   const hand = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.10, 0.18), skinMat);
@@ -120,14 +120,16 @@ function buildShieldArm(team, raceKey, liveryMat, skinMat, accentMat, weaponStyl
 function buildAccessory(v, helmetMat, skinMat, boneMat, raceKey, hair) {
   const g = new THREE.Group();
   if (v.capH > 0) {
-    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.32, v.capH, 16), helmetMat);
+    const cap = new THREE.Mesh(new THREE.ConeGeometry(0.30, v.capH, 18), helmetMat);
     cap.position.y = 2.20 + v.capH * 0.5 - 0.10; cap.castShadow = true;
-    const brim = new THREE.Mesh(new THREE.TorusGeometry(0.30, 0.04, 8, 18), helmetMat);
+    const brim = new THREE.Mesh(new THREE.TorusGeometry(0.28, 0.04, 8, 24), helmetMat);
     brim.rotation.x = Math.PI / 2; brim.position.y = 2.18;
+    const flapL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.18), helmetMat); flapL.position.set(-0.22, 2.05, 0.02); flapL.castShadow = true;
+    const flapR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.18), helmetMat); flapR.position.set( 0.22, 2.05, 0.02); flapR.castShadow = true;
     const plumeMat = lambert(0xc44545, true);
-    const plume = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.40, 6), plumeMat);
+    const plume = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.40, 8), plumeMat);
     plume.position.y = 2.20 + v.capH + 0.14; plume.rotation.x = -0.3; plume.castShadow = true;
-    g.add(cap, brim, plume);
+    g.add(cap, brim, flapL, flapR, plume);
   }
   if (v.accessory === 'beard') {
     const beard = new THREE.Mesh(new THREE.SphereGeometry(0.22, 14, 12), lambert(hair));
@@ -150,11 +152,19 @@ function buildAccessory(v, helmetMat, skinMat, boneMat, raceKey, hair) {
 function buildCape(accentMat) {
   const g = new THREE.Group();
   const capeMat = new THREE.MeshLambertMaterial({ color: accentMat.color, side: THREE.DoubleSide });
-  for (let i = 0; i < 5; i++) {
-    const a = (i - 2) * 0.18;
-    const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.95), capeMat);
-    seg.position.set(Math.sin(a) * 0.30, 1.15, -0.42 - Math.cos(a) * 0.05);
+  for (let i = 0; i < 7; i++) {
+    const a = (i - 3) * 0.14;
+    const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 1.00), capeMat);
+    seg.position.set(Math.sin(a) * 0.34, 1.15, -0.42 - Math.cos(a) * 0.04);
     seg.rotation.y = a; seg.rotation.x = -0.06;
+    g.add(seg);
+  }
+  const mantleMat = new THREE.MeshLambertMaterial({ color: accentMat.color, side: THREE.DoubleSide });
+  for (let i = 0; i < 9; i++) {
+    const a = -Math.PI / 2 + (i / 8) * Math.PI;
+    const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.36), mantleMat);
+    seg.position.set(Math.cos(a) * 0.42, 1.78, Math.sin(a) * 0.42);
+    seg.rotation.y = -a + Math.PI / 2; seg.rotation.x = 0.12;
     g.add(seg);
   }
   return g;
