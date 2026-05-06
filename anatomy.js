@@ -59,8 +59,8 @@ export function buildBlobBody(skinHex, accentHex, resolution = 96, isolation = 8
   const tex = generateSkinTexture(skinHex, accentHex);
   const mat = new THREE.MeshLambertMaterial({ map: tex });
   const mc = new MarchingCubes(resolution, mat, true, true, 200000);
-  mc.position.set(0, 1.0, 0);
-  mc.scale.setScalar(2.4);
+  mc.position.set(0, 1.16, 0);
+  mc.scale.setScalar(2.32);
   mc.isolation = isolation;
   mc.reset();
   for (const [x, y, z, str, sub] of BLOB_RIG) mc.addBall(x, y, z, str, sub);
