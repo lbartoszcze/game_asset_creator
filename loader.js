@@ -34,6 +34,7 @@ export function buildHumanoidUnit(team) {
   if (bbox.min.y < 0) root.position.y = -bbox.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
+      m.frustumCulled = false;
       const mat = m.material.clone();
       if (team && team.livery && mat.color) {
         const tint = new THREE.Color(team.livery);
