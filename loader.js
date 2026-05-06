@@ -40,9 +40,14 @@ export function buildRaceUnit(raceKey, team) {
   const proto = PROTOTYPES[raceKey];
   if (!proto) return null;
   const root = SkeletonUtils.clone(proto.scene);
-  root.scale.setScalar(1.0);
-  const bbox = new THREE.Box3().setFromObject(root);
-  if (bbox.min.y < 0) root.position.y = -bbox.min.y;
+  const preBbox = new THREE.Box3().setFromObject(root);
+  const preSize = preBbox.getSize(new THREE.Vector3());
+  const targetH = 2.0;
+  const measured = Math.max(preSize.y, preSize.x, preSize.z);
+  const s = measured > 0 ? targetH / measured : 1;
+  root.scale.setScalar(s);
+  const bbox2 = new THREE.Box3().setFromObject(root);
+  if (bbox2.min.y !== 0) root.position.y = -bbox2.min.y;
   root.traverse((m) => {
     if (m.isMesh && m.material) {
       m.frustumCulled = false;
