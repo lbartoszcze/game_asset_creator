@@ -42,8 +42,11 @@ export function buildRaceUnit(raceKey, team) {
   const root = SkeletonUtils.clone(proto.scene);
   const preBbox = new THREE.Box3().setFromObject(root);
   const preSize = preBbox.getSize(new THREE.Vector3());
+  if (preSize.y < preSize.x * 0.6 && preSize.y < preSize.z * 0.6) root.rotation.x = -Math.PI / 2;
+  const orientedBbox = new THREE.Box3().setFromObject(root);
+  const orientedSize = orientedBbox.getSize(new THREE.Vector3());
   const targetH = 2.0;
-  const measured = Math.max(preSize.y, preSize.x, preSize.z);
+  const measured = orientedSize.y > 0 ? orientedSize.y : Math.max(orientedSize.x, orientedSize.z);
   const s = measured > 0 ? targetH / measured : 1;
   root.scale.setScalar(s);
   const bbox2 = new THREE.Box3().setFromObject(root);
