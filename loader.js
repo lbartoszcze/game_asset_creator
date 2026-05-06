@@ -39,8 +39,10 @@ export function isRaceReady(raceKey) { return PROTOTYPES[raceKey] != null; }
 export function buildRaceUnit(raceKey, team) {
   const proto = PROTOTYPES[raceKey];
   if (!proto) return null;
-  const root = SkeletonUtils.clone(proto.scene);
-  const preBbox = new THREE.Box3().setFromObject(root);
+  const inner = SkeletonUtils.clone(proto.scene);
+  const root = new THREE.Group();
+  root.add(inner);
+  const preBbox = new THREE.Box3().setFromObject(inner);
   const preSize = preBbox.getSize(new THREE.Vector3());
   if (preSize.y < preSize.x * 0.6 && preSize.y < preSize.z * 0.6) root.rotation.x = -Math.PI / 2;
   const orientedBbox = new THREE.Box3().setFromObject(root);
@@ -71,7 +73,7 @@ export function buildRaceUnit(raceKey, team) {
       m.material = mat;
     }
   });
-  const mixer = new THREE.AnimationMixer(root);
+  const mixer = new THREE.AnimationMixer(inner);
   const clips = {};
   for (const c of proto.animations) clips[c.name] = c;
   return { root, mixer, clips };
