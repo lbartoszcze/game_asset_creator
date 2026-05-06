@@ -40,6 +40,10 @@ export function buildRaceUnit(raceKey, team) {
   const proto = PROTOTYPES[raceKey];
   if (!proto) return null;
   const inner = SkeletonUtils.clone(proto.scene);
+  const innerBbox = new THREE.Box3().setFromObject(inner);
+  const innerCenter = innerBbox.getCenter(new THREE.Vector3());
+  inner.position.sub(innerCenter);
+  inner.position.y += (innerBbox.max.y - innerBbox.min.y) / 2;
   const root = new THREE.Group();
   root.add(inner);
   root.traverse((m) => {
