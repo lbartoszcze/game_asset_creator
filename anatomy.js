@@ -69,6 +69,29 @@ function buildLegs(accentMat, dark) {
   return g;
 }
 
+function buildRaceMarks(raceKey, liveryMat, boneMat) {
+  const g = new THREE.Group();
+  if (raceKey === 'dwarves') {
+    const rivetMat = lambert(0x707378, true);
+    for (const [x, y] of [[-0.18, 1.55], [0.18, 1.55], [-0.18, 1.30], [0.18, 1.30], [0, 1.42]]) {
+      const r = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 6), rivetMat); r.position.set(x, y, 0.42); g.add(r);
+    }
+  } else if (raceKey === 'skeletons') {
+    for (let i = 0; i < 4; i++) {
+      const rib = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.015, 6, 16, Math.PI), boneMat);
+      rib.position.set(0, 1.55 - i * 0.10, 0.10); rib.rotation.x = Math.PI; g.add(rib);
+    }
+  } else if (raceKey === 'elves') {
+    const vineMat = lambert(0x68b870);
+    for (let i = 0; i < 6; i++) {
+      const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.04, 6, 4), vineMat);
+      leaf.scale.set(1, 0.4, 0.6); leaf.position.set((i % 2 ? 1 : -1) * 0.50, 1.20 - Math.floor(i / 2) * 0.18, 0.10);
+      g.add(leaf);
+    }
+  }
+  return g;
+}
+
 function buildTorso(team, liveryMat, accentMat, beltMat, skinMat) {
   const g = new THREE.Group();
   const torso = new THREE.Mesh(lathe(TORSO_PROFILE, 18), liveryMat); torso.position.y = 1.05; torso.castShadow = true;
@@ -190,6 +213,7 @@ export function makeBody(team, raceKey, armorTier = 0, weaponTier = 0, klass = '
   g.add(buildTorso(team, liveryMat, accentMat, beltMat, skinMat));
   g.add(buildHead(v, raceKey, skinMat, boneMat, eyeMat));
   g.add(buildAccessory(v, helmetMat, skinMat, boneMat, raceKey, v.hair));
+  g.add(buildRaceMarks(raceKey, liveryMat, boneMat));
   g.add(buildCape(accentMat));
   const tierArmor = buildArmorTier(team, raceKey, armorTier);
   g.add(tierArmor);
