@@ -255,6 +255,21 @@ export function sculptHumanoid(opts = {}) {
   addBrow(verts, colors, idx, palette);
   addFaceFeatures(verts, colors, idx, palette, { beard: opts.beard, beardColor: opts.beardColor, ears: opts.ears });
   buildAxe(verts, colors, idx, palette);
+  // Chest emblem — gold cross shape on the front of the chest
+  const emblem = new THREE.Color(0xfff5b8);
+  addBox(verts, colors, idx, emblem, 0.0, 1.42, 0.32, 0.04, 0.18, 0.02);
+  addBox(verts, colors, idx, emblem, 0.0, 1.42, 0.32, 0.14, 0.04, 0.02);
+  // Belt buckle
+  const buckle = new THREE.Color(0xc9a44a);
+  addBox(verts, colors, idx, buckle, 0.0, 1.06, 0.22, 0.10, 0.06, 0.02);
+  // Greaves — angled metal strips on the front of each shin
+  const greave = new THREE.Color(0x9a9aa6);
+  addBox(verts, colors, idx, greave, -0.23, 0.20, 0.45, 0.10, 0.16, 0.03);
+  addBox(verts, colors, idx, greave,  0.18, 0.20, -0.13, 0.10, 0.16, 0.03);
+  // Shoulder pauldrons — squared off plates over each shoulder
+  const pauld = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
+  addBox(verts, colors, idx, pauld, -0.46, 1.72, 0.0, 0.10, 0.06, 0.16);
+  addBox(verts, colors, idx, pauld,  0.46, 1.72, 0.10, 0.10, 0.06, 0.16);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
