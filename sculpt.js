@@ -17,14 +17,13 @@ const TORSO_RINGS = [
 ];
 
 const HEAD_RINGS = [
-  { y: 1.80, r: 0.16, c: 'skin' },
-  { y: 1.86, r: 0.20, c: 'skin' },
-  { y: 1.94, r: 0.22, c: 'skin' },
-  { y: 2.02, r: 0.24, c: 'helmet' },
-  { y: 2.10, r: 0.25, c: 'helmet' },
-  { y: 2.18, r: 0.24, c: 'helmet' },
-  { y: 2.26, r: 0.20, c: 'helmet' },
-  { y: 2.32, r: 0.14, c: 'helmet' },
+  { y: 1.84, r: 0.15, c: 'skin' },
+  { y: 1.92, r: 0.22, c: 'helmet' },
+  { y: 2.00, r: 0.25, c: 'helmet' },
+  { y: 2.10, r: 0.26, c: 'helmet' },
+  { y: 2.20, r: 0.25, c: 'helmet' },
+  { y: 2.28, r: 0.22, c: 'helmet' },
+  { y: 2.36, r: 0.16, c: 'helmet' },
 ];
 
 const ARM_PATH_LEFT = [
@@ -192,14 +191,11 @@ export function sculptHumanoid(opts = {}) {
   buildArmorDetails(verts, colors, idx, palette, opts);
   buildCape(verts, colors, idx, opts);
   buildBodyDetails(verts, colors, idx, palette, opts);
-  // Bandolier strap — diagonal leather strip across chest (left shoulder to right hip)
-  const bandolier = new THREE.Color(0x33231a);
-  for (let i = 0; i < 6; i++) {
-    const t = i / 5;
-    const x = -0.30 + t * 0.50;
-    const y = 1.62 - t * 0.40;
-    const z = 0.30 + Math.sin(t * Math.PI) * 0.02;
-    addBox(verts, colors, idx, bandolier, x, y, z, 0.04, 0.05, 0.018);
+  // Helmet horns — angled spikes on each side (stylized warrior look)
+  if (!opts.noHorns) {
+    const horn = new THREE.Color(0x2a2a2a);
+    addBox(verts, colors, idx, horn, -0.30, 2.18, -0.04, 0.025, 0.18, 0.03);
+    addBox(verts, colors, idx, horn,  0.30, 2.18, -0.04, 0.025, 0.18, 0.03);
   }
   // Helmet side medallions on cheek guards
   const medallion = new THREE.Color(0xfff5b8);
