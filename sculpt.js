@@ -199,6 +199,27 @@ export function sculptHumanoid(opts = {}) {
   buildArmorDetails(verts, colors, idx, palette, opts);
   buildCape(verts, colors, idx, opts);
   buildBodyDetails(verts, colors, idx, palette, opts);
+  // Bandolier strap — diagonal leather strip across chest (left shoulder to right hip)
+  const bandolier = new THREE.Color(0x33231a);
+  for (let i = 0; i < 6; i++) {
+    const t = i / 5;
+    const x = -0.30 + t * 0.50;
+    const y = 1.62 - t * 0.40;
+    const z = 0.30 + Math.sin(t * Math.PI) * 0.02;
+    addBox(verts, colors, idx, bandolier, x, y, z, 0.04, 0.05, 0.018);
+  }
+  // Helmet side medallions
+  const medallion = new THREE.Color(0xfff5b8);
+  addBox(verts, colors, idx, medallion, -0.235, 2.10, 0.04, 0.014, 0.030, 0.030);
+  addBox(verts, colors, idx, medallion,  0.235, 2.10, 0.04, 0.014, 0.030, 0.030);
+  // Greave vertical seam (line down the front of each shin plate)
+  const greaveSeam = new THREE.Color(0x707378);
+  addBox(verts, colors, idx, greaveSeam, -0.23, 0.20, 0.475, 0.012, 0.16, 0.012);
+  addBox(verts, colors, idx, greaveSeam,  0.18, 0.20, -0.155, 0.012, 0.16, 0.012);
+  // Axe blade highlight — thin lighter strip on the cutting edge
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), 0.96, 1.51, 0.94, 0.025, 0.04, 0.005);
+  // Cape fold — vertical raised line down the middle of the cape
+  addBox(verts, colors, idx, new THREE.Color(0x4a0a0a), 0.0, 1.32, -0.36, 0.015, 0.50, 0.015);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
