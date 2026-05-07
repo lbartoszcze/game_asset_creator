@@ -20,10 +20,11 @@ const HEAD_RINGS = [
   { y: 1.80, r: 0.16, c: 'skin' },
   { y: 1.86, r: 0.20, c: 'skin' },
   { y: 1.94, r: 0.22, c: 'skin' },
-  { y: 2.04, r: 0.22, c: 'helmet' },
-  { y: 2.14, r: 0.22, c: 'helmet' },
-  { y: 2.22, r: 0.20, c: 'helmet' },
-  { y: 2.30, r: 0.10, c: 'helmet' },
+  { y: 2.02, r: 0.24, c: 'helmet' },
+  { y: 2.10, r: 0.25, c: 'helmet' },
+  { y: 2.18, r: 0.24, c: 'helmet' },
+  { y: 2.26, r: 0.20, c: 'helmet' },
+  { y: 2.32, r: 0.14, c: 'helmet' },
 ];
 
 const ARM_PATH_LEFT = [
@@ -197,6 +198,16 @@ export function sculptHumanoid(opts = {}) {
   buildAxe(verts, colors, idx, colorOf(palette, 'belt'), colorOf(palette, 'gauntlet'));
   buildArmorDetails(verts, colors, idx, palette, opts);
   buildCape(verts, colors, idx, opts);
+  // Helmet visor band — dark slot across the eye line
+  addBox(verts, colors, idx, new THREE.Color(0x1a1a1f), 0.0, 2.06, 0.235, 0.18, 0.018, 0.018);
+  // Helmet crest — raised spine running front-to-back along the top
+  addBox(verts, colors, idx, new THREE.Color(0x6a2010), 0.0, 2.34, 0.0, 0.025, 0.05, 0.20);
+  // Cheek guards — vertical plates on each side of the face
+  const helmCol = colorOf(palette, 'helmet');
+  addBox(verts, colors, idx, helmCol, -0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
+  addBox(verts, colors, idx, helmCol,  0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
+  // Chin strap
+  addBox(verts, colors, idx, new THREE.Color(0x3a2a1a), 0.0, 1.80, 0.18, 0.18, 0.02, 0.02);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
