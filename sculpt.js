@@ -1,56 +1,62 @@
 import * as THREE from 'three';
 
-// Each ring is { y, rx, rz, dx } — height, half-width X, half-depth Z, lateral offset.
-// SEG = vertices per ring. Higher = smoother circumference.
 const SEG = 40;
 
 const TORSO_RINGS = [
-  { y: 0.95, rx: 0.16, rz: 0.13 },
-  { y: 1.00, rx: 0.22, rz: 0.16 },
-  { y: 1.10, rx: 0.30, rz: 0.20 },
-  { y: 1.22, rx: 0.36, rz: 0.22 },
-  { y: 1.36, rx: 0.42, rz: 0.24 },
-  { y: 1.50, rx: 0.46, rz: 0.26 },
-  { y: 1.62, rx: 0.46, rz: 0.26 },
-  { y: 1.72, rx: 0.40, rz: 0.22 },
-  { y: 1.82, rx: 0.16, rz: 0.14 },
+  { y: 0.95, rx: 0.34, rz: 0.22, c: 'pants' },
+  { y: 1.00, rx: 0.36, rz: 0.24, c: 'belt' },
+  { y: 1.06, rx: 0.30, rz: 0.20, c: 'belt' },
+  { y: 1.14, rx: 0.34, rz: 0.22, c: 'armor' },
+  { y: 1.28, rx: 0.42, rz: 0.26, c: 'armor' },
+  { y: 1.42, rx: 0.48, rz: 0.30, c: 'armor' },
+  { y: 1.54, rx: 0.50, rz: 0.30, c: 'armor' },
+  { y: 1.62, rx: 0.50, rz: 0.30, c: 'armor' },
+  { y: 1.70, rx: 0.42, rz: 0.26, c: 'collar' },
+  { y: 1.76, rx: 0.20, rz: 0.16, c: 'skin' },
 ];
 
 const HEAD_RINGS = [
-  { y: 1.86, r: 0.16 },
-  { y: 1.92, r: 0.20 },
-  { y: 2.00, r: 0.22 },
-  { y: 2.10, r: 0.22 },
-  { y: 2.18, r: 0.18 },
-  { y: 2.24, r: 0.10 },
+  { y: 1.80, r: 0.16, c: 'skin' },
+  { y: 1.86, r: 0.20, c: 'skin' },
+  { y: 1.94, r: 0.22, c: 'skin' },
+  { y: 2.04, r: 0.22, c: 'helmet' },
+  { y: 2.14, r: 0.22, c: 'helmet' },
+  { y: 2.22, r: 0.20, c: 'helmet' },
+  { y: 2.30, r: 0.10, c: 'helmet' },
 ];
 
 const ARM_PATH = [
-  { t: 0.0,  r: 0.12, p: [-0.46, 1.66, 0.0] },
-  { t: 0.15, r: 0.14, p: [-0.50, 1.50, 0.05] },
-  { t: 0.30, r: 0.13, p: [-0.50, 1.30, 0.10] },
-  { t: 0.50, r: 0.10, p: [-0.50, 1.10, 0.18] },
-  { t: 0.70, r: 0.09, p: [-0.50, 0.92, 0.26] },
-  { t: 0.85, r: 0.08, p: [-0.48, 0.78, 0.32] },
-  { t: 1.00, r: 0.07, p: [-0.46, 0.72, 0.34] },
+  { r: 0.18, c: 'armor', p: [-0.48, 1.66, 0.0] },
+  { r: 0.16, c: 'armor', p: [-0.52, 1.50, 0.04] },
+  { r: 0.14, c: 'skin',  p: [-0.52, 1.32, 0.08] },
+  { r: 0.12, c: 'skin',  p: [-0.50, 1.16, 0.14] },
+  { r: 0.11, c: 'skin',  p: [-0.48, 1.00, 0.20] },
+  { r: 0.13, c: 'gauntlet', p: [-0.46, 0.86, 0.26] },
+  { r: 0.10, c: 'skin',  p: [-0.44, 0.78, 0.30] },
 ];
 
 const LEG_PATH = [
-  { t: 0.0,  r: 0.20, p: [-0.18, 0.98, 0.0] },
-  { t: 0.10, r: 0.21, p: [-0.18, 0.86, 0.0] },
-  { t: 0.30, r: 0.18, p: [-0.18, 0.62, 0.0] },
-  { t: 0.45, r: 0.15, p: [-0.18, 0.46, 0.02] },
-  { t: 0.55, r: 0.16, p: [-0.18, 0.36, 0.0] },
-  { t: 0.75, r: 0.14, p: [-0.18, 0.20, -0.02] },
-  { t: 0.92, r: 0.13, p: [-0.18, 0.06, -0.04] },
-  { t: 1.00, r: 0.16, p: [-0.18, 0.02, 0.05] },
+  { r: 0.22, c: 'pants', p: [-0.18, 0.92, 0.0] },
+  { r: 0.22, c: 'pants', p: [-0.18, 0.78, 0.0] },
+  { r: 0.18, c: 'pants', p: [-0.18, 0.60, 0.0] },
+  { r: 0.16, c: 'pants', p: [-0.18, 0.44, 0.02] },
+  { r: 0.17, c: 'pants', p: [-0.18, 0.30, 0.0] },
+  { r: 0.15, c: 'boot',  p: [-0.18, 0.18, -0.02] },
+  { r: 0.18, c: 'boot',  p: [-0.18, 0.08, -0.02] },
+  { r: 0.22, c: 'boot',  p: [-0.18, 0.02, 0.06] },
 ];
 
-function pushRing(verts, cx, cy, cz, rx, rz, segments = SEG) {
+function colorOf(palette, name) {
+  return palette[name] || palette.skin;
+}
+
+function pushRing(verts, colors, palette, cName, cx, cy, cz, rx, rz, segments = SEG) {
   const startIdx = verts.length / 3;
+  const col = colorOf(palette, cName);
   for (let i = 0; i < segments; i++) {
     const a = (i / segments) * Math.PI * 2;
     verts.push(cx + Math.cos(a) * rx, cy, cz + Math.sin(a) * rz);
+    colors.push(col.r, col.g, col.b);
   }
   return startIdx;
 }
@@ -63,63 +69,94 @@ function stitchRings(idx, ringA, ringB, segments = SEG) {
   }
 }
 
-function capRing(idx, ringStart, centerIdx, segments = SEG, flip = false) {
+function capRing(idx, ringStart, centerIdx, segments = SEG) {
   for (let i = 0; i < segments; i++) {
     const j = (i + 1) % segments;
-    if (flip) idx.push(ringStart + i, centerIdx, ringStart + j);
-    else idx.push(ringStart + j, centerIdx, ringStart + i);
+    idx.push(ringStart + j, centerIdx, ringStart + i);
   }
 }
 
-function buildTorso(verts, idx) {
-  const ringStarts = [];
-  for (const r of TORSO_RINGS) ringStarts.push(pushRing(verts, 0, r.y, 0, r.rx, r.rz));
-  for (let i = 0; i < ringStarts.length - 1; i++) stitchRings(idx, ringStarts[i], ringStarts[i + 1]);
-  return ringStarts;
-}
-
-function buildHead(verts, idx) {
-  const ringStarts = [];
-  for (const r of HEAD_RINGS) ringStarts.push(pushRing(verts, 0, r.y, 0.02, r.r, r.r * 0.92));
-  for (let i = 0; i < ringStarts.length - 1; i++) stitchRings(idx, ringStarts[i], ringStarts[i + 1]);
-  const topVert = verts.length / 3;
-  verts.push(0, 2.30, 0.02);
-  capRing(idx, ringStarts[ringStarts.length - 1], topVert);
-  return ringStarts;
-}
-
-function pathRing(verts, node, segments = SEG, mirrorX = false) {
-  const [x, y, z] = node.p;
-  const px = mirrorX ? -x : x;
-  return pushRing(verts, px, y, z, node.r, node.r, segments);
-}
-
-function buildLimb(verts, idx, path, mirrorX) {
-  const starts = path.map((n) => pathRing(verts, n, SEG, mirrorX));
+function buildTorso(verts, colors, idx, palette) {
+  const starts = TORSO_RINGS.map((r) => pushRing(verts, colors, palette, r.c, 0, r.y, 0, r.rx, r.rz));
   for (let i = 0; i < starts.length - 1; i++) stitchRings(idx, starts[i], starts[i + 1]);
-  const tipVert = verts.length / 3;
-  const tip = path[path.length - 1];
-  const px = mirrorX ? -tip.p[0] : tip.p[0];
-  verts.push(px, tip.p[1] - 0.02, tip.p[2]);
-  capRing(idx, starts[starts.length - 1], tipVert);
   return starts;
 }
 
+function buildHead(verts, colors, idx, palette) {
+  const starts = HEAD_RINGS.map((r) => pushRing(verts, colors, palette, r.c, 0, r.y, 0.02, r.r, r.r * 0.92));
+  for (let i = 0; i < starts.length - 1; i++) stitchRings(idx, starts[i], starts[i + 1]);
+  const topIdx = verts.length / 3;
+  verts.push(0, 2.36, 0.02);
+  const helmCol = colorOf(palette, 'helmet');
+  colors.push(helmCol.r, helmCol.g, helmCol.b);
+  capRing(idx, starts[starts.length - 1], topIdx);
+  return starts;
+}
+
+function pathRing(verts, colors, palette, node, mirrorX = false) {
+  const [x, y, z] = node.p;
+  const px = mirrorX ? -x : x;
+  return pushRing(verts, colors, palette, node.c, px, y, z, node.r, node.r);
+}
+
+function buildLimb(verts, colors, idx, palette, path, mirrorX, capColorName) {
+  const starts = path.map((n) => pathRing(verts, colors, palette, n, mirrorX));
+  for (let i = 0; i < starts.length - 1; i++) stitchRings(idx, starts[i], starts[i + 1]);
+  const tipIdx = verts.length / 3;
+  const tip = path[path.length - 1];
+  const px = mirrorX ? -tip.p[0] : tip.p[0];
+  verts.push(px, tip.p[1] - 0.04, tip.p[2] + 0.04);
+  const cc = colorOf(palette, capColorName || tip.c);
+  colors.push(cc.r, cc.g, cc.b);
+  capRing(idx, starts[starts.length - 1], tipIdx);
+  return starts;
+}
+
+function addBrow(verts, colors, idx, palette) {
+  const skinCol = colorOf(palette, 'skin');
+  const baseY = 2.04, baseZ = 0.22;
+  const start = verts.length / 3;
+  const pts = [];
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 15) * Math.PI - Math.PI / 2;
+    pts.push([Math.sin(a) * 0.12, baseY + Math.cos(a) * 0.02, baseZ]);
+  }
+  for (const [x, y, z] of pts) { verts.push(x, y, z); colors.push(skinCol.r, skinCol.g, skinCol.b); }
+  for (const [x, y, z] of pts) { verts.push(x, y - 0.04, z + 0.005); colors.push(skinCol.r * 0.6, skinCol.g * 0.6, skinCol.b * 0.6); }
+  for (let i = 0; i < pts.length - 1; i++) {
+    idx.push(start + i, start + i + 1, start + pts.length + i);
+    idx.push(start + pts.length + i, start + i + 1, start + pts.length + i + 1);
+  }
+}
+
+function paletteFor(opts) {
+  const skin = new THREE.Color(opts.skin != null ? opts.skin : 0xd9b48a);
+  const armor = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
+  const helmet = new THREE.Color(opts.helmet != null ? opts.helmet : 0x9a9aa6);
+  const pants = new THREE.Color(opts.pants != null ? opts.pants : 0x4a3a2a);
+  const boot = new THREE.Color(opts.boot != null ? opts.boot : 0x2a1f15);
+  const belt = new THREE.Color(opts.belt != null ? opts.belt : 0x33231a);
+  const collar = new THREE.Color(opts.collar != null ? opts.collar : 0xb8843e);
+  const gauntlet = new THREE.Color(opts.gauntlet != null ? opts.gauntlet : 0x8a8a98);
+  return { skin, armor, helmet, pants, boot, belt, collar, gauntlet };
+}
+
 export function sculptHumanoid(opts = {}) {
-  const skinHex = opts.skin != null ? opts.skin : 0xc89a6a;
-  const verts = [];
-  const idx = [];
-  buildTorso(verts, idx);
-  buildHead(verts, idx);
-  buildLimb(verts, idx, ARM_PATH, false);
-  buildLimb(verts, idx, ARM_PATH, true);
-  buildLimb(verts, idx, LEG_PATH, false);
-  buildLimb(verts, idx, LEG_PATH, true);
+  const palette = paletteFor(opts);
+  const verts = []; const colors = []; const idx = [];
+  buildTorso(verts, colors, idx, palette);
+  buildHead(verts, colors, idx, palette);
+  buildLimb(verts, colors, idx, palette, ARM_PATH, false, 'gauntlet');
+  buildLimb(verts, colors, idx, palette, ARM_PATH, true, 'gauntlet');
+  buildLimb(verts, colors, idx, palette, LEG_PATH, false, 'boot');
+  buildLimb(verts, colors, idx, palette, LEG_PATH, true, 'boot');
+  addBrow(verts, colors, idx, palette);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+  geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geom.setIndex(idx);
   geom.computeVertexNormals();
-  const mat = new THREE.MeshLambertMaterial({ color: skinHex });
+  const mat = new THREE.MeshLambertMaterial({ vertexColors: true });
   const mesh = new THREE.Mesh(geom, mat);
   mesh.castShadow = true; mesh.receiveShadow = true;
   return mesh;
