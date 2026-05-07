@@ -31,7 +31,7 @@ const ARM_PATH_LEFT = [
   { r: 0.22, c: 'armor',    p: [-0.58, 1.66, 0.00] },
   { r: 0.20, c: 'armor',    p: [-0.60, 1.48, 0.04] },
   { r: 0.18, c: 'skin',     p: [-0.58, 1.30, 0.08] },
-  { r: 0.16, c: 'skin',     p: [-0.55, 1.12, 0.16] },
+  { r: 0.16, c: 'skin',     p: [-0.78, 1.12, 0.16] },
   { r: 0.15, c: 'skin',     p: [-0.52, 0.96, 0.24] },
   { r: 0.20, c: 'gauntlet', p: [-0.50, 0.82, 0.30] },
   { r: 0.18, c: 'skin',     p: [-0.48, 0.74, 0.34] },
@@ -232,7 +232,7 @@ export function sculptHumanoid(opts = {}) {
     const start = verts.length / 3;
     for (let j = 0; j < 24; j++) {
       const a = (j / 24) * Math.PI * 2;
-      verts.push(-0.55 + Math.cos(a) * r * 0.05, cy + Math.sin(a) * r, cz + Math.cos(a) * r);
+      verts.push(-0.78 + Math.cos(a) * r * 0.05, cy + Math.sin(a) * r, cz + Math.cos(a) * r);
       const c = i === 3 ? shieldRim : shieldFace;
       colors.push(c.r, c.g, c.b);
     }
@@ -246,10 +246,10 @@ export function sculptHumanoid(opts = {}) {
     }
   }
   // Shield boss — central protrusion
-  addBox(verts, colors, idx, shieldRim, -0.55, 1.04, 0.42, 0.025, 0.06, 0.06);
+  addBox(verts, colors, idx, shieldRim, -0.78, 1.04, 0.42, 0.025, 0.06, 0.06);
   // Shield emblem — gold cross on the face
-  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.53, 1.04, 0.42, 0.012, 0.14, 0.025);
-  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.53, 1.04, 0.42, 0.012, 0.025, 0.14);
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.76, 1.04, 0.42, 0.012, 0.14, 0.025);
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.76, 1.04, 0.42, 0.012, 0.025, 0.14);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));

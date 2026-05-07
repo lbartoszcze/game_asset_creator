@@ -20,7 +20,7 @@ function stitchRings(idx, ringA, ringB, segments) {
 }
 
 export function buildAxe(verts, colors, idx, haftCol, bladeCol) {
-  const HX = 0.60, HY = 1.06, HZ = 0.70;
+  const HX = 0.70, HY = 1.00, HZ = 0.72;
   const haftSeg = 12;
   const haftRings = [];
   for (let i = 0; i <= 6; i++) {
@@ -120,10 +120,10 @@ export function buildBodyDetails(verts, colors, idx, palette, opts) {
     addBox(verts, colors, idx, hairCol,  0.0,  1.93, 0.225, 0.05, 0.04, 0.02);
   }
   // Pauldron rim + cape clasps
-  addBox(verts, colors, idx, C(0xfff5b8), -0.46, 1.66, 0.02, 0.10, 0.012, 0.16);
-  addBox(verts, colors, idx, C(0xfff5b8),  0.46, 1.66, 0.12, 0.10, 0.012, 0.16);
-  addBox(verts, colors, idx, C(0xfff5b8), -0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
-  addBox(verts, colors, idx, C(0xfff5b8),  0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
+  addBox(verts, colors, idx, C(0xfff5b8), -0.58, 1.66, 0.02, 0.14, 0.012, 0.18);
+  addBox(verts, colors, idx, C(0xfff5b8),  0.58, 1.66, 0.12, 0.14, 0.012, 0.18);
+  addBox(verts, colors, idx, C(0xfff5b8), -0.36, 1.78, -0.14, 0.05, 0.05, 0.030);
+  addBox(verts, colors, idx, C(0xfff5b8),  0.36, 1.78, -0.14, 0.05, 0.05, 0.030);
   // Chest plate detail
   const abShade = new THREE.Color(armor.r * 0.85, armor.g * 0.85, armor.b * 0.85);
   addBox(verts, colors, idx, abShade, 0.0, 1.18, 0.31, 0.20, 0.025, 0.02);
@@ -133,10 +133,10 @@ export function buildBodyDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, pec, -0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
   addBox(verts, colors, idx, pec,  0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
   // Fists + knuckles + grip + brows
-  addBox(verts, colors, idx, gaunt, -0.45, 0.74, 0.32, 0.06, 0.07, 0.06);
-  addBox(verts, colors, idx, gaunt,  0.60, 1.02, 0.72, 0.06, 0.07, 0.06);
-  for (const [hx, hy, hz] of [[-0.45, 0.74, 0.32], [0.60, 1.02, 0.72]]) for (let i = 0; i < 4; i++) addBox(verts, colors, idx, C(0x404048), hx, hy + 0.04, hz + 0.05 - i * 0.025, 0.05, 0.012, 0.008);
-  addBox(verts, colors, idx, C(0x33231a), 0.60, 1.06, 0.70, 0.05, 0.10, 0.05);
+  addBox(verts, colors, idx, gaunt, -0.50, 0.70, 0.36, 0.10, 0.10, 0.10);
+  addBox(verts, colors, idx, gaunt,  0.70, 0.94, 0.74, 0.10, 0.10, 0.10);
+  for (const [hx, hy, hz] of [[-0.50, 0.70, 0.36], [0.70, 0.94, 0.74]]) for (let i = 0; i < 4; i++) addBox(verts, colors, idx, C(0x404048), hx, hy + 0.06, hz + 0.06 - i * 0.030, 0.08, 0.014, 0.010);
+  addBox(verts, colors, idx, C(0x33231a), 0.70, 1.00, 0.72, 0.07, 0.12, 0.07);
   const browCol = C(opts.beardColor != null ? opts.beardColor : 0x3a2010);
   addBox(verts, colors, idx, browCol, -0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
   addBox(verts, colors, idx, browCol,  0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
