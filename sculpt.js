@@ -270,6 +270,23 @@ export function sculptHumanoid(opts = {}) {
   const pauld = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
   addBox(verts, colors, idx, pauld, -0.46, 1.72, 0.0, 0.10, 0.06, 0.16);
   addBox(verts, colors, idx, pauld,  0.46, 1.72, 0.10, 0.10, 0.06, 0.16);
+  // Cape — tapered panel hanging behind shoulders
+  const capeCol = new THREE.Color(opts.cape != null ? opts.cape : 0x8a1a1a);
+  const c0 = verts.length / 3;
+  // 6 vertices: top-L, top-R, mid-L, mid-R, bot-L, bot-R, all behind body (-Z)
+  const capeVerts = [
+    [-0.30, 1.78, -0.18], [ 0.30, 1.78, -0.18],
+    [-0.36, 1.40, -0.34], [ 0.36, 1.40, -0.34],
+    [-0.32, 0.80, -0.42], [ 0.32, 0.80, -0.42],
+  ];
+  for (const [x, y, z] of capeVerts) { verts.push(x, y, z); colors.push(capeCol.r, capeCol.g, capeCol.b); }
+  // Two quads = four triangles
+  idx.push(c0+0, c0+2, c0+1, c0+1, c0+2, c0+3);
+  idx.push(c0+2, c0+4, c0+3, c0+3, c0+4, c0+5);
+  // Back side (winding flipped) so cape isn't single-sided
+  for (const [x, y, z] of capeVerts) { verts.push(x, y, z + 0.02); colors.push(capeCol.r * 0.7, capeCol.g * 0.7, capeCol.b * 0.7); }
+  idx.push(c0+6+0, c0+6+1, c0+6+2, c0+6+1, c0+6+3, c0+6+2);
+  idx.push(c0+6+2, c0+6+3, c0+6+4, c0+6+3, c0+6+5, c0+6+4);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
