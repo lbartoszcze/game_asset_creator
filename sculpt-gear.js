@@ -159,6 +159,16 @@ export function buildExtraDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, C(0xfff5b8),  0.10, 1.30, -0.36, 0.020, 0.50, 0.014);
   // Axe pommel cap
   addBox(verts, colors, idx, C(0xc9a44a), 0.65, 0.62, 0.66, 0.05, 0.05, 0.05);
+  // Axe head decorative band — gold ring around where blade meets haft
+  addBox(verts, colors, idx, C(0xc9a44a), 0.86, 1.45, 1.00, 0.05, 0.04, 0.10);
+  // Axe head spike on top (counter-spike opposite the blade)
+  addBox(verts, colors, idx, new THREE.Color(palette.gauntlet.r * 0.7, palette.gauntlet.g * 0.7, palette.gauntlet.b * 0.7), 0.74, 1.66, 1.00, 0.025, 0.10, 0.025);
+  // Cape lower edge — wider tail flare
+  const capeC = C(opts.cape != null ? opts.cape : 0x8a1a1a);
+  addBox(verts, colors, idx, capeC, 0.0, 0.78, -0.42, 0.36, 0.04, 0.04);
+  // Tabard bottom serration (V-cut suggestion via two angled boxes)
+  addBox(verts, colors, idx, capeC, -0.06, 0.62, 0.245, 0.04, 0.04, 0.018);
+  addBox(verts, colors, idx, capeC,  0.06, 0.62, 0.245, 0.04, 0.04, 0.018);
 }
 
 export function buildCape(verts, colors, idx, opts) {
