@@ -234,6 +234,25 @@ export function sculptHumanoid(opts = {}) {
   addBox(verts, colors, idx, scabbardCol, -0.34, 0.70, -0.10, 0.04, 0.34, 0.05);
   // Scabbard mouth (gold cap)
   addBox(verts, colors, idx, new THREE.Color(0xc9a44a), -0.34, 0.94, -0.10, 0.06, 0.04, 0.06);
+  // Sword hilt poking out of the scabbard
+  addBox(verts, colors, idx, new THREE.Color(0x3a2a1a), -0.34, 1.04, -0.10, 0.025, 0.10, 0.025);
+  addBox(verts, colors, idx, new THREE.Color(0xc9a44a), -0.34, 1.16, -0.10, 0.10, 0.025, 0.04);
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.34, 1.21, -0.10, 0.030, 0.030, 0.030);
+  // Hair fringe — short bangs under the helmet brim (skip for skeletons or beard races since beard already hints hair)
+  if (!opts.bald) {
+    const hairCol = new THREE.Color(opts.hair != null ? opts.hair : 0x4a2a14);
+    addBox(verts, colors, idx, hairCol, -0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
+    addBox(verts, colors, idx, hairCol,  0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
+    addBox(verts, colors, idx, hairCol,  0.0,  1.93, 0.225, 0.05, 0.04, 0.02);
+  }
+  // Pauldron rim — gold edge around each pauldron
+  const rimGold = new THREE.Color(0xfff5b8);
+  addBox(verts, colors, idx, rimGold, -0.46, 1.66, 0.02, 0.10, 0.012, 0.16);
+  addBox(verts, colors, idx, rimGold,  0.46, 1.66, 0.12, 0.10, 0.012, 0.16);
+  // Boot top cuffs
+  const cuffCol = new THREE.Color(0xc9a44a);
+  addBox(verts, colors, idx, cuffCol, -0.22, 0.16, 0.40, 0.10, 0.025, 0.08);
+  addBox(verts, colors, idx, cuffCol,  0.18, 0.16, -0.16, 0.10, 0.025, 0.08);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
