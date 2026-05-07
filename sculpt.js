@@ -146,17 +146,24 @@ function addBox(verts, colors, idx, color, cx, cy, cz, hx, hy, hz) {
   for (const [a, b, c, d] of F) { idx.push(v0+a, v0+b, v0+c, v0+a, v0+c, v0+d); }
 }
 
-function addFaceFeatures(verts, colors, idx, palette) {
+function addFaceFeatures(verts, colors, idx, palette, opts = {}) {
   const eye = new THREE.Color(0x101015);
   const lip = new THREE.Color(0x6a2010);
   const nose = colorOf(palette, 'skin');
-  // Eyes
-  addBox(verts, colors, idx, eye, -0.07, 1.96, 0.215, 0.020, 0.018, 0.010);
-  addBox(verts, colors, idx, eye,  0.07, 1.96, 0.215, 0.020, 0.018, 0.010);
-  // Nose ridge
-  addBox(verts, colors, idx, nose, 0.0, 1.92, 0.225, 0.025, 0.045, 0.020);
-  // Mouth line
-  addBox(verts, colors, idx, lip, 0.0, 1.84, 0.215, 0.045, 0.012, 0.008);
+  addBox(verts, colors, idx, eye, -0.07, 1.96, 0.215, 0.022, 0.020, 0.012);
+  addBox(verts, colors, idx, eye,  0.07, 1.96, 0.215, 0.022, 0.020, 0.012);
+  addBox(verts, colors, idx, nose, 0.0, 1.92, 0.225, 0.030, 0.050, 0.025);
+  addBox(verts, colors, idx, lip, 0.0, 1.84, 0.215, 0.050, 0.014, 0.010);
+  if (opts.beard) {
+    const beard = new THREE.Color(opts.beardColor != null ? opts.beardColor : 0x6e3f1f);
+    addBox(verts, colors, idx, beard, 0.00, 1.82, 0.20, 0.18, 0.10, 0.08);
+    addBox(verts, colors, idx, beard, 0.00, 1.72, 0.18, 0.16, 0.08, 0.06);
+  }
+  if (opts.ears) {
+    const earCol = colorOf(palette, 'skin');
+    addBox(verts, colors, idx, earCol, -0.22, 2.00, 0.0, 0.04, 0.10, 0.04);
+    addBox(verts, colors, idx, earCol,  0.22, 2.00, 0.0, 0.04, 0.10, 0.04);
+  }
 }
 
 function addBrow(verts, colors, idx, palette) {
@@ -246,7 +253,7 @@ export function sculptHumanoid(opts = {}) {
   buildLimb(verts, colors, idx, palette, LEG_PATH_LEFT, false, 'boot');
   buildLimb(verts, colors, idx, palette, LEG_PATH_RIGHT, false, 'boot');
   addBrow(verts, colors, idx, palette);
-  addFaceFeatures(verts, colors, idx, palette);
+  addFaceFeatures(verts, colors, idx, palette, { beard: opts.beard, beardColor: opts.beardColor, ears: opts.ears });
   buildAxe(verts, colors, idx, palette);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
