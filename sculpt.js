@@ -208,6 +208,22 @@ export function sculptHumanoid(opts = {}) {
   addBox(verts, colors, idx, helmCol,  0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
   // Chin strap
   addBox(verts, colors, idx, new THREE.Color(0x3a2a1a), 0.0, 1.80, 0.18, 0.18, 0.02, 0.02);
+  // Boot toes — wedge in front of each foot
+  const bootCol = colorOf(palette, 'boot');
+  addBox(verts, colors, idx, bootCol, -0.23, 0.04, 0.56, 0.10, 0.06, 0.10);
+  addBox(verts, colors, idx, bootCol,  0.18, 0.04, -0.20, 0.10, 0.06, 0.10);
+  // Wide belt strip wrapping the waist (front)
+  const beltCol = colorOf(palette, 'belt');
+  addBox(verts, colors, idx, beltCol, 0.0, 1.04, 0.20, 0.32, 0.04, 0.04);
+  addBox(verts, colors, idx, beltCol, -0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
+  addBox(verts, colors, idx, beltCol,  0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
+  // Knee plates — rounded armor pads on each knee
+  const kneeCol = colorOf(palette, 'helmet');
+  addBox(verts, colors, idx, kneeCol, -0.22, 0.44, 0.32, 0.10, 0.06, 0.04);
+  addBox(verts, colors, idx, kneeCol,  0.18, 0.44, -0.12, 0.10, 0.06, 0.04);
+  // Forearm bracer rings on left (shield) arm
+  const bracerCol = colorOf(palette, 'gauntlet');
+  addBox(verts, colors, idx, bracerCol, -0.49, 1.10, 0.16, 0.06, 0.04, 0.06);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
