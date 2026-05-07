@@ -220,6 +220,36 @@ export function sculptHumanoid(opts = {}) {
   addBox(verts, colors, idx, new THREE.Color(0xfff5b8), 0.96, 1.51, 0.94, 0.025, 0.04, 0.005);
   // Cape fold — vertical raised line down the middle of the cape
   addBox(verts, colors, idx, new THREE.Color(0x4a0a0a), 0.0, 1.32, -0.36, 0.015, 0.50, 0.015);
+  // Round shield on left arm — disc with a central boss
+  const shieldFace = new THREE.Color(opts.shield != null ? opts.shield : 0x8a1a1a);
+  const shieldRim = new THREE.Color(0xc9a44a);
+  // Shield disc as a flattened ring stack
+  const shieldRings = [];
+  for (let i = 0; i < 4; i++) {
+    const r = 0.14 + i * 0.05;
+    const cy = 1.04;
+    const cz = 0.40 - (i === 0 ? 0.04 : 0);
+    const start = verts.length / 3;
+    for (let j = 0; j < 24; j++) {
+      const a = (j / 24) * Math.PI * 2;
+      verts.push(-0.55 + Math.cos(a) * r * 0.05, cy + Math.sin(a) * r, cz + Math.cos(a) * r);
+      const c = i === 3 ? shieldRim : shieldFace;
+      colors.push(c.r, c.g, c.b);
+    }
+    shieldRings.push(start);
+  }
+  for (let i = 0; i < shieldRings.length - 1; i++) {
+    for (let j = 0; j < 24; j++) {
+      const k = (j + 1) % 24;
+      idx.push(shieldRings[i] + j, shieldRings[i] + k, shieldRings[i + 1] + j);
+      idx.push(shieldRings[i + 1] + j, shieldRings[i] + k, shieldRings[i + 1] + k);
+    }
+  }
+  // Shield boss — central protrusion
+  addBox(verts, colors, idx, shieldRim, -0.55, 1.04, 0.42, 0.025, 0.06, 0.06);
+  // Shield emblem — gold cross on the face
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.53, 1.04, 0.42, 0.012, 0.14, 0.025);
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.53, 1.04, 0.42, 0.012, 0.025, 0.14);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
