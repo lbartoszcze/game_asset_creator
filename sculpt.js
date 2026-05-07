@@ -253,6 +253,22 @@ export function sculptHumanoid(opts = {}) {
   const cuffCol = new THREE.Color(0xc9a44a);
   addBox(verts, colors, idx, cuffCol, -0.22, 0.16, 0.40, 0.10, 0.025, 0.08);
   addBox(verts, colors, idx, cuffCol,  0.18, 0.16, -0.16, 0.10, 0.025, 0.08);
+  // Abdominal segment plates — 3 horizontal strips above the belt
+  const abCol = colorOf(palette, 'armor');
+  const abShade = new THREE.Color(abCol.r * 0.85, abCol.g * 0.85, abCol.b * 0.85);
+  addBox(verts, colors, idx, abShade, 0.0, 1.18, 0.31, 0.20, 0.025, 0.02);
+  addBox(verts, colors, idx, abShade, 0.0, 1.13, 0.31, 0.18, 0.025, 0.02);
+  // Pectoral split — vertical seam down the middle of the chest plate
+  const seam = new THREE.Color(abCol.r * 0.7, abCol.g * 0.7, abCol.b * 0.7);
+  addBox(verts, colors, idx, seam, 0.0, 1.45, 0.33, 0.012, 0.20, 0.014);
+  // Pec definition — two slightly-raised plates on either side of the chest seam
+  const pecCol = new THREE.Color(abCol.r * 1.1, abCol.g * 1.1, abCol.b * 1.1);
+  addBox(verts, colors, idx, pecCol, -0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
+  addBox(verts, colors, idx, pecCol,  0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
+  // Cape clasps — gold discs at each shoulder where the cape attaches
+  const clasp = new THREE.Color(0xfff5b8);
+  addBox(verts, colors, idx, clasp, -0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
+  addBox(verts, colors, idx, clasp,  0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
