@@ -135,6 +135,32 @@ export function buildBodyDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, C(0x33231a), 0.70, 1.00, 0.72, 0.07, 0.12, 0.07);
 }
 
+export function buildExtraDetails(verts, colors, idx, palette, opts) {
+  const C = (h) => new THREE.Color(h);
+  const helm = palette.helmet;
+  // Pauldron spikes
+  if (!opts.noSpikes) {
+    const spikeCol = new THREE.Color(helm.r * 0.85, helm.g * 0.85, helm.b * 0.85);
+    addBox(verts, colors, idx, spikeCol, -0.62, 1.78, 0.05, 0.04, 0.10, 0.04);
+    addBox(verts, colors, idx, spikeCol, -0.55, 1.82, 0.02, 0.03, 0.06, 0.03);
+    addBox(verts, colors, idx, spikeCol,  0.62, 1.78, 0.15, 0.04, 0.10, 0.04);
+    addBox(verts, colors, idx, spikeCol,  0.55, 1.82, 0.12, 0.03, 0.06, 0.03);
+  }
+  // Fur trim
+  if (opts.fur !== false) {
+    const fur = C(opts.furColor != null ? opts.furColor : 0xe8e0d0);
+    for (let i = 0; i < 7; i++) {
+      const a = -1.0 + (i / 6) * 2.0;
+      addBox(verts, colors, idx, fur, a * 0.40, 1.74, 0.16, 0.06, 0.05, 0.08);
+    }
+  }
+  // Cape iconic stripes
+  addBox(verts, colors, idx, C(0xfff5b8), -0.10, 1.30, -0.36, 0.020, 0.50, 0.014);
+  addBox(verts, colors, idx, C(0xfff5b8),  0.10, 1.30, -0.36, 0.020, 0.50, 0.014);
+  // Axe pommel cap
+  addBox(verts, colors, idx, C(0xc9a44a), 0.65, 0.62, 0.66, 0.05, 0.05, 0.05);
+}
+
 export function buildCape(verts, colors, idx, opts) {
   const c = new THREE.Color(opts.cape != null ? opts.cape : 0x8a1a1a);
   const c0 = verts.length / 3;

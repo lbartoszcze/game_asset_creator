@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, buildAxe, buildArmorDetails, buildCape, buildBodyDetails } from './sculpt-gear.js';
+import { addBox, buildAxe, buildArmorDetails, buildCape, buildBodyDetails, buildExtraDetails } from './sculpt-gear.js';
 
 const SEG = 40;
 
@@ -233,6 +233,7 @@ export function sculptHumanoid(opts = {}) {
   // Belt large center buckle (replace small one with bigger gold square)
   addBox(verts, colors, idx, new THREE.Color(0xfff5b8), 0.0, 1.04, 0.36, 0.07, 0.05, 0.012);
   addBox(verts, colors, idx, new THREE.Color(0xc9a44a), 0.0, 1.04, 0.355, 0.06, 0.04, 0.022);
+  buildExtraDetails(verts, colors, idx, palette, opts);
   // Helmet side medallions on cheek guards
   const medallion = new THREE.Color(0xfff5b8);
   addBox(verts, colors, idx, medallion, -0.246, 1.96, 0.18, 0.014, 0.030, 0.030);
