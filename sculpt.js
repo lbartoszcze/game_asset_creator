@@ -45,15 +45,26 @@ const ARM_PATH_RIGHT = [
   { r: 0.10, c: 'skin',     p: [ 0.60, 1.06, 0.70] },
 ];
 
-const LEG_PATH = [
-  { r: 0.22, c: 'pants', p: [-0.18, 0.92, 0.0] },
-  { r: 0.22, c: 'pants', p: [-0.18, 0.78, 0.0] },
-  { r: 0.18, c: 'pants', p: [-0.18, 0.60, 0.0] },
-  { r: 0.16, c: 'pants', p: [-0.18, 0.44, 0.02] },
-  { r: 0.17, c: 'pants', p: [-0.18, 0.30, 0.0] },
-  { r: 0.15, c: 'boot',  p: [-0.18, 0.18, -0.02] },
-  { r: 0.18, c: 'boot',  p: [-0.18, 0.08, -0.02] },
-  { r: 0.22, c: 'boot',  p: [-0.18, 0.02, 0.06] },
+const LEG_PATH_LEFT = [
+  { r: 0.22, c: 'pants', p: [-0.20, 0.92, 0.00] },
+  { r: 0.22, c: 'pants', p: [-0.21, 0.78, 0.10] },
+  { r: 0.18, c: 'pants', p: [-0.22, 0.60, 0.20] },
+  { r: 0.16, c: 'pants', p: [-0.23, 0.44, 0.30] },
+  { r: 0.17, c: 'pants', p: [-0.23, 0.30, 0.36] },
+  { r: 0.15, c: 'boot',  p: [-0.23, 0.18, 0.40] },
+  { r: 0.18, c: 'boot',  p: [-0.23, 0.08, 0.42] },
+  { r: 0.22, c: 'boot',  p: [-0.23, 0.02, 0.48] },
+];
+
+const LEG_PATH_RIGHT = [
+  { r: 0.22, c: 'pants', p: [ 0.18, 0.92,  0.00] },
+  { r: 0.22, c: 'pants', p: [ 0.18, 0.78, -0.04] },
+  { r: 0.18, c: 'pants', p: [ 0.18, 0.60, -0.08] },
+  { r: 0.16, c: 'pants', p: [ 0.18, 0.44, -0.12] },
+  { r: 0.17, c: 'pants', p: [ 0.18, 0.30, -0.14] },
+  { r: 0.15, c: 'boot',  p: [ 0.18, 0.18, -0.16] },
+  { r: 0.18, c: 'boot',  p: [ 0.18, 0.08, -0.16] },
+  { r: 0.22, c: 'boot',  p: [ 0.18, 0.02, -0.10] },
 ];
 
 function colorOf(palette, name) {
@@ -120,6 +131,32 @@ function buildLimb(verts, colors, idx, palette, path, mirrorX, capColorName) {
   colors.push(cc.r, cc.g, cc.b);
   capRing(idx, starts[starts.length - 1], tipIdx);
   return starts;
+}
+
+function addBox(verts, colors, idx, color, cx, cy, cz, hx, hy, hz) {
+  const v0 = verts.length / 3;
+  const corners = [
+    [cx - hx, cy - hy, cz - hz], [cx + hx, cy - hy, cz - hz],
+    [cx + hx, cy + hy, cz - hz], [cx - hx, cy + hy, cz - hz],
+    [cx - hx, cy - hy, cz + hz], [cx + hx, cy - hy, cz + hz],
+    [cx + hx, cy + hy, cz + hz], [cx - hx, cy + hy, cz + hz],
+  ];
+  for (const [x, y, z] of corners) { verts.push(x, y, z); colors.push(color.r, color.g, color.b); }
+  const F = [[0,1,2,3],[5,4,7,6],[1,5,6,2],[4,0,3,7],[3,2,6,7],[4,5,1,0]];
+  for (const [a, b, c, d] of F) { idx.push(v0+a, v0+b, v0+c, v0+a, v0+c, v0+d); }
+}
+
+function addFaceFeatures(verts, colors, idx, palette) {
+  const eye = new THREE.Color(0x101015);
+  const lip = new THREE.Color(0x6a2010);
+  const nose = colorOf(palette, 'skin');
+  // Eyes
+  addBox(verts, colors, idx, eye, -0.07, 1.96, 0.215, 0.020, 0.018, 0.010);
+  addBox(verts, colors, idx, eye,  0.07, 1.96, 0.215, 0.020, 0.018, 0.010);
+  // Nose ridge
+  addBox(verts, colors, idx, nose, 0.0, 1.92, 0.225, 0.025, 0.045, 0.020);
+  // Mouth line
+  addBox(verts, colors, idx, lip, 0.0, 1.84, 0.215, 0.045, 0.012, 0.008);
 }
 
 function addBrow(verts, colors, idx, palette) {
@@ -200,9 +237,10 @@ export function sculptHumanoid(opts = {}) {
   buildHead(verts, colors, idx, palette);
   buildLimb(verts, colors, idx, palette, ARM_PATH_LEFT, false, 'gauntlet');
   buildLimb(verts, colors, idx, palette, ARM_PATH_RIGHT, false, 'gauntlet');
-  buildLimb(verts, colors, idx, palette, LEG_PATH, false, 'boot');
-  buildLimb(verts, colors, idx, palette, LEG_PATH, true, 'boot');
+  buildLimb(verts, colors, idx, palette, LEG_PATH_LEFT, false, 'boot');
+  buildLimb(verts, colors, idx, palette, LEG_PATH_RIGHT, false, 'boot');
   addBrow(verts, colors, idx, palette);
+  addFaceFeatures(verts, colors, idx, palette);
   buildAxe(verts, colors, idx, palette);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
