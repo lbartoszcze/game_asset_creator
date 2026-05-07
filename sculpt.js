@@ -17,11 +17,11 @@ const TORSO_RINGS = [
 ];
 
 const HEAD_RINGS = [
-  { y: 1.84, r: 0.15, c: 'skin' },
-  { y: 1.92, r: 0.22, c: 'helmet' },
-  { y: 2.00, r: 0.25, c: 'helmet' },
-  { y: 2.10, r: 0.26, c: 'helmet' },
-  { y: 2.20, r: 0.25, c: 'helmet' },
+  { y: 1.86, r: 0.20, c: 'helmet' },
+  { y: 1.92, r: 0.24, c: 'helmet' },
+  { y: 2.00, r: 0.26, c: 'helmet' },
+  { y: 2.10, r: 0.27, c: 'helmet' },
+  { y: 2.20, r: 0.26, c: 'helmet' },
   { y: 2.28, r: 0.22, c: 'helmet' },
   { y: 2.36, r: 0.16, c: 'helmet' },
 ];
