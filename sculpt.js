@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { addBox, buildAxe, buildArmorDetails, buildCape } from './sculpt-gear.js';
 
 const SEG = 40;
 
@@ -133,19 +134,6 @@ function buildLimb(verts, colors, idx, palette, path, mirrorX, capColorName) {
   return starts;
 }
 
-function addBox(verts, colors, idx, color, cx, cy, cz, hx, hy, hz) {
-  const v0 = verts.length / 3;
-  const corners = [
-    [cx - hx, cy - hy, cz - hz], [cx + hx, cy - hy, cz - hz],
-    [cx + hx, cy + hy, cz - hz], [cx - hx, cy + hy, cz - hz],
-    [cx - hx, cy - hy, cz + hz], [cx + hx, cy - hy, cz + hz],
-    [cx + hx, cy + hy, cz + hz], [cx - hx, cy + hy, cz + hz],
-  ];
-  for (const [x, y, z] of corners) { verts.push(x, y, z); colors.push(color.r, color.g, color.b); }
-  const F = [[0,1,2,3],[5,4,7,6],[1,5,6,2],[4,0,3,7],[3,2,6,7],[4,5,1,0]];
-  for (const [a, b, c, d] of F) { idx.push(v0+a, v0+b, v0+c, v0+a, v0+c, v0+d); }
-}
-
 function addFaceFeatures(verts, colors, idx, palette, opts = {}) {
   const eye = new THREE.Color(0x101015);
   const lip = new THREE.Color(0x6a2010);
@@ -183,54 +171,6 @@ function addBrow(verts, colors, idx, palette) {
   }
 }
 
-function buildAxe(verts, colors, idx, palette) {
-  // The right hand ends at world (0.60, 1.06, 0.70). Place the axe so the haft
-  // passes through the hand and the head (blade) extends outward.
-  const HX = 0.60, HY = 1.06, HZ = 0.70;
-  const haftCol = colorOf(palette, 'belt'); // dark wood
-  const bladeCol = colorOf(palette, 'gauntlet'); // metal
-  const haftSeg = 12;
-  // Haft: 7 cross-section rings along a diagonal from down-back to up-forward
-  const haftRings = [];
-  for (let i = 0; i <= 6; i++) {
-    const t = i / 6;
-    const cx = HX + (t - 0.5) * 0.08;
-    const cy = HY - 0.40 + t * 0.80;
-    const cz = HZ + (t - 0.5) * 0.30;
-    const start = verts.length / 3;
-    for (let j = 0; j < haftSeg; j++) {
-      const a = (j / haftSeg) * Math.PI * 2;
-      verts.push(cx + Math.cos(a) * 0.04, cy, cz + Math.sin(a) * 0.04);
-      colors.push(haftCol.r, haftCol.g, haftCol.b);
-    }
-    haftRings.push(start);
-  }
-  for (let i = 0; i < haftRings.length - 1; i++) stitchRings(idx, haftRings[i], haftRings[i + 1], haftSeg);
-  // Axe head: a recognizable single-bit axe profile — narrow at the haft, flaring out to a curved blade.
-  // Profile is a polygon in the plane perpendicular to the haft, then extruded both sides for thickness.
-  const HEAD_X = HX + 0.16, HEAD_Y = HY + 0.45, HEAD_Z = HZ + 0.28;
-  const profile = [
-    [-0.04, -0.10], [ 0.04, -0.18], [ 0.20, -0.20], [ 0.36, -0.14],
-    [ 0.42, -0.04], [ 0.44,  0.06], [ 0.40,  0.16], [ 0.30,  0.22],
-    [ 0.16,  0.22], [ 0.04,  0.18], [-0.04,  0.10],
-  ];
-  const v0 = verts.length / 3;
-  const thickness = 0.06;
-  for (const [u, w] of profile) { verts.push(HEAD_X + u, HEAD_Y + w, HEAD_Z + thickness); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
-  for (const [u, w] of profile) { verts.push(HEAD_X + u, HEAD_Y + w, HEAD_Z - thickness); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
-  const N = profile.length;
-  // Front face triangle fan
-  for (let i = 1; i < N - 1; i++) idx.push(v0, v0 + i, v0 + i + 1);
-  // Back face (reverse winding)
-  for (let i = 1; i < N - 1; i++) idx.push(v0 + N, v0 + N + i + 1, v0 + N + i);
-  // Side strips
-  for (let i = 0; i < N; i++) {
-    const j = (i + 1) % N;
-    idx.push(v0 + i, v0 + N + i, v0 + j);
-    idx.push(v0 + j, v0 + N + i, v0 + N + j);
-  }
-}
-
 function paletteFor(opts) {
   const skin = new THREE.Color(opts.skin != null ? opts.skin : 0xd9b48a);
   const armor = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
@@ -254,39 +194,9 @@ export function sculptHumanoid(opts = {}) {
   buildLimb(verts, colors, idx, palette, LEG_PATH_RIGHT, false, 'boot');
   addBrow(verts, colors, idx, palette);
   addFaceFeatures(verts, colors, idx, palette, { beard: opts.beard, beardColor: opts.beardColor, ears: opts.ears });
-  buildAxe(verts, colors, idx, palette);
-  // Chest emblem — gold cross shape on the front of the chest
-  const emblem = new THREE.Color(0xfff5b8);
-  addBox(verts, colors, idx, emblem, 0.0, 1.42, 0.32, 0.04, 0.18, 0.02);
-  addBox(verts, colors, idx, emblem, 0.0, 1.42, 0.32, 0.14, 0.04, 0.02);
-  // Belt buckle
-  const buckle = new THREE.Color(0xc9a44a);
-  addBox(verts, colors, idx, buckle, 0.0, 1.06, 0.22, 0.10, 0.06, 0.02);
-  // Greaves — angled metal strips on the front of each shin
-  const greave = new THREE.Color(0x9a9aa6);
-  addBox(verts, colors, idx, greave, -0.23, 0.20, 0.45, 0.10, 0.16, 0.03);
-  addBox(verts, colors, idx, greave,  0.18, 0.20, -0.13, 0.10, 0.16, 0.03);
-  // Shoulder pauldrons — squared off plates over each shoulder
-  const pauld = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
-  addBox(verts, colors, idx, pauld, -0.46, 1.72, 0.0, 0.10, 0.06, 0.16);
-  addBox(verts, colors, idx, pauld,  0.46, 1.72, 0.10, 0.10, 0.06, 0.16);
-  // Cape — tapered panel hanging behind shoulders
-  const capeCol = new THREE.Color(opts.cape != null ? opts.cape : 0x8a1a1a);
-  const c0 = verts.length / 3;
-  // 6 vertices: top-L, top-R, mid-L, mid-R, bot-L, bot-R, all behind body (-Z)
-  const capeVerts = [
-    [-0.30, 1.78, -0.18], [ 0.30, 1.78, -0.18],
-    [-0.36, 1.40, -0.34], [ 0.36, 1.40, -0.34],
-    [-0.32, 0.80, -0.42], [ 0.32, 0.80, -0.42],
-  ];
-  for (const [x, y, z] of capeVerts) { verts.push(x, y, z); colors.push(capeCol.r, capeCol.g, capeCol.b); }
-  // Two quads = four triangles
-  idx.push(c0+0, c0+2, c0+1, c0+1, c0+2, c0+3);
-  idx.push(c0+2, c0+4, c0+3, c0+3, c0+4, c0+5);
-  // Back side (winding flipped) so cape isn't single-sided
-  for (const [x, y, z] of capeVerts) { verts.push(x, y, z + 0.02); colors.push(capeCol.r * 0.7, capeCol.g * 0.7, capeCol.b * 0.7); }
-  idx.push(c0+6+0, c0+6+1, c0+6+2, c0+6+1, c0+6+3, c0+6+2);
-  idx.push(c0+6+2, c0+6+3, c0+6+4, c0+6+3, c0+6+5, c0+6+4);
+  buildAxe(verts, colors, idx, colorOf(palette, 'belt'), colorOf(palette, 'gauntlet'));
+  buildArmorDetails(verts, colors, idx, palette, opts);
+  buildCape(verts, colors, idx, opts);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
