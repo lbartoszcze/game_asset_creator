@@ -75,6 +75,73 @@ export function buildArmorDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, armorCol,  0.18, 0.36, -0.04, 0.14, 0.06, 0.02);
 }
 
+export function buildBodyDetails(verts, colors, idx, palette, opts) {
+  const C = (h) => new THREE.Color(h);
+  const helm = palette.helmet, boot = palette.boot, belt = palette.belt, gaunt = palette.gauntlet, armor = palette.armor;
+  // Helmet
+  addBox(verts, colors, idx, C(0x1a1a1f), 0.0, 2.06, 0.235, 0.18, 0.018, 0.018);
+  addBox(verts, colors, idx, C(0x6a2010), 0.0, 2.34, 0.0, 0.025, 0.05, 0.20);
+  addBox(verts, colors, idx, helm, -0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
+  addBox(verts, colors, idx, helm,  0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
+  addBox(verts, colors, idx, C(0x3a2a1a), 0.0, 1.80, 0.18, 0.18, 0.02, 0.02);
+  addBox(verts, colors, idx, new THREE.Color(helm.r * 1.05, helm.g * 1.05, helm.b * 1.05), 0.0, 2.06, 0.245, 0.20, 0.06, 0.018);
+  addBox(verts, colors, idx, helm, 0.0, 2.06, 0.262, 0.012, 0.10, 0.018);
+  addBox(verts, colors, idx, helm, -0.225, 2.04, -0.04, 0.018, 0.12, 0.10);
+  addBox(verts, colors, idx, helm,  0.225, 2.04, -0.04, 0.018, 0.12, 0.10);
+  addBox(verts, colors, idx, helm, 0.0, 1.91, 0.0, 0.245, 0.020, 0.245);
+  // Boots
+  addBox(verts, colors, idx, boot, -0.23, 0.04, 0.56, 0.10, 0.06, 0.10);
+  addBox(verts, colors, idx, boot,  0.18, 0.04, -0.20, 0.10, 0.06, 0.10);
+  addBox(verts, colors, idx, C(0xc9a44a), -0.22, 0.16, 0.40, 0.10, 0.025, 0.08);
+  addBox(verts, colors, idx, C(0xc9a44a),  0.18, 0.16, -0.16, 0.10, 0.025, 0.08);
+  // Belt + buckle bands
+  addBox(verts, colors, idx, belt, 0.0, 1.04, 0.20, 0.32, 0.04, 0.04);
+  addBox(verts, colors, idx, belt, -0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
+  addBox(verts, colors, idx, belt,  0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
+  // Knee plates + bracer
+  addBox(verts, colors, idx, helm, -0.22, 0.44, 0.32, 0.10, 0.06, 0.04);
+  addBox(verts, colors, idx, helm,  0.18, 0.44, -0.12, 0.10, 0.06, 0.04);
+  addBox(verts, colors, idx, gaunt, -0.49, 1.10, 0.16, 0.06, 0.04, 0.06);
+  // Tabard
+  const tabardC = C(opts.tabard != null ? opts.tabard : (opts.cape != null ? opts.cape : 0x8a1a1a));
+  addBox(verts, colors, idx, tabardC, 0.0, 0.84, 0.24, 0.16, 0.20, 0.02);
+  addBox(verts, colors, idx, C(0xfff5b8), 0.0, 0.66, 0.245, 0.18, 0.014, 0.018);
+  // Scabbard + hilt
+  addBox(verts, colors, idx, C(0x3a2a1a), -0.34, 0.70, -0.10, 0.04, 0.34, 0.05);
+  addBox(verts, colors, idx, C(0xc9a44a), -0.34, 0.94, -0.10, 0.06, 0.04, 0.06);
+  addBox(verts, colors, idx, C(0x3a2a1a), -0.34, 1.04, -0.10, 0.025, 0.10, 0.025);
+  addBox(verts, colors, idx, C(0xc9a44a), -0.34, 1.16, -0.10, 0.10, 0.025, 0.04);
+  addBox(verts, colors, idx, C(0xfff5b8), -0.34, 1.21, -0.10, 0.030, 0.030, 0.030);
+  // Hair fringe
+  if (!opts.bald) {
+    const hairCol = C(opts.hair != null ? opts.hair : 0x4a2a14);
+    addBox(verts, colors, idx, hairCol, -0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
+    addBox(verts, colors, idx, hairCol,  0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
+    addBox(verts, colors, idx, hairCol,  0.0,  1.93, 0.225, 0.05, 0.04, 0.02);
+  }
+  // Pauldron rim + cape clasps
+  addBox(verts, colors, idx, C(0xfff5b8), -0.46, 1.66, 0.02, 0.10, 0.012, 0.16);
+  addBox(verts, colors, idx, C(0xfff5b8),  0.46, 1.66, 0.12, 0.10, 0.012, 0.16);
+  addBox(verts, colors, idx, C(0xfff5b8), -0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
+  addBox(verts, colors, idx, C(0xfff5b8),  0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
+  // Chest plate detail
+  const abShade = new THREE.Color(armor.r * 0.85, armor.g * 0.85, armor.b * 0.85);
+  addBox(verts, colors, idx, abShade, 0.0, 1.18, 0.31, 0.20, 0.025, 0.02);
+  addBox(verts, colors, idx, abShade, 0.0, 1.13, 0.31, 0.18, 0.025, 0.02);
+  addBox(verts, colors, idx, new THREE.Color(armor.r * 0.7, armor.g * 0.7, armor.b * 0.7), 0.0, 1.45, 0.33, 0.012, 0.20, 0.014);
+  const pec = new THREE.Color(armor.r * 1.1, armor.g * 1.1, armor.b * 1.1);
+  addBox(verts, colors, idx, pec, -0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
+  addBox(verts, colors, idx, pec,  0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
+  // Fists + knuckles + grip + brows
+  addBox(verts, colors, idx, gaunt, -0.45, 0.74, 0.32, 0.06, 0.07, 0.06);
+  addBox(verts, colors, idx, gaunt,  0.60, 1.02, 0.72, 0.06, 0.07, 0.06);
+  for (const [hx, hy, hz] of [[-0.45, 0.74, 0.32], [0.60, 1.02, 0.72]]) for (let i = 0; i < 4; i++) addBox(verts, colors, idx, C(0x404048), hx, hy + 0.04, hz + 0.05 - i * 0.025, 0.05, 0.012, 0.008);
+  addBox(verts, colors, idx, C(0x33231a), 0.60, 1.06, 0.70, 0.05, 0.10, 0.05);
+  const browCol = C(opts.beardColor != null ? opts.beardColor : 0x3a2010);
+  addBox(verts, colors, idx, browCol, -0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
+  addBox(verts, colors, idx, browCol,  0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
+}
+
 export function buildCape(verts, colors, idx, opts) {
   const c = new THREE.Color(opts.cape != null ? opts.cape : 0x8a1a1a);
   const c0 = verts.length / 3;

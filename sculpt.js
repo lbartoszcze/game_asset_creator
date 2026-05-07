@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { addBox, buildAxe, buildArmorDetails, buildCape } from './sculpt-gear.js';
+import { addBox, buildAxe, buildArmorDetails, buildCape, buildBodyDetails } from './sculpt-gear.js';
 
 const SEG = 40;
 
@@ -198,96 +198,7 @@ export function sculptHumanoid(opts = {}) {
   buildAxe(verts, colors, idx, colorOf(palette, 'belt'), colorOf(palette, 'gauntlet'));
   buildArmorDetails(verts, colors, idx, palette, opts);
   buildCape(verts, colors, idx, opts);
-  // Helmet visor band — dark slot across the eye line
-  addBox(verts, colors, idx, new THREE.Color(0x1a1a1f), 0.0, 2.06, 0.235, 0.18, 0.018, 0.018);
-  // Helmet crest — raised spine running front-to-back along the top
-  addBox(verts, colors, idx, new THREE.Color(0x6a2010), 0.0, 2.34, 0.0, 0.025, 0.05, 0.20);
-  // Cheek guards — vertical plates on each side of the face
-  const helmCol = colorOf(palette, 'helmet');
-  addBox(verts, colors, idx, helmCol, -0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
-  addBox(verts, colors, idx, helmCol,  0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
-  // Chin strap
-  addBox(verts, colors, idx, new THREE.Color(0x3a2a1a), 0.0, 1.80, 0.18, 0.18, 0.02, 0.02);
-  // Boot toes — wedge in front of each foot
-  const bootCol = colorOf(palette, 'boot');
-  addBox(verts, colors, idx, bootCol, -0.23, 0.04, 0.56, 0.10, 0.06, 0.10);
-  addBox(verts, colors, idx, bootCol,  0.18, 0.04, -0.20, 0.10, 0.06, 0.10);
-  // Wide belt strip wrapping the waist (front)
-  const beltCol = colorOf(palette, 'belt');
-  addBox(verts, colors, idx, beltCol, 0.0, 1.04, 0.20, 0.32, 0.04, 0.04);
-  addBox(verts, colors, idx, beltCol, -0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
-  addBox(verts, colors, idx, beltCol,  0.30, 1.04, 0.10, 0.04, 0.04, 0.16);
-  // Knee plates — rounded armor pads on each knee
-  const kneeCol = colorOf(palette, 'helmet');
-  addBox(verts, colors, idx, kneeCol, -0.22, 0.44, 0.32, 0.10, 0.06, 0.04);
-  addBox(verts, colors, idx, kneeCol,  0.18, 0.44, -0.12, 0.10, 0.06, 0.04);
-  // Forearm bracer rings on left (shield) arm
-  const bracerCol = colorOf(palette, 'gauntlet');
-  addBox(verts, colors, idx, bracerCol, -0.49, 1.10, 0.16, 0.06, 0.04, 0.06);
-  // Tabard — decorative cloth panel hanging from belt down to mid-thigh
-  const tabard = new THREE.Color(opts.tabard != null ? opts.tabard : (opts.cape != null ? opts.cape : 0x8a1a1a));
-  addBox(verts, colors, idx, tabard, 0.0, 0.84, 0.24, 0.16, 0.20, 0.02);
-  // Tabard trim — gold edge
-  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), 0.0, 0.66, 0.245, 0.18, 0.014, 0.018);
-  // Sword scabbard hanging at left hip
-  const scabbardCol = new THREE.Color(0x3a2a1a);
-  addBox(verts, colors, idx, scabbardCol, -0.34, 0.70, -0.10, 0.04, 0.34, 0.05);
-  // Scabbard mouth (gold cap)
-  addBox(verts, colors, idx, new THREE.Color(0xc9a44a), -0.34, 0.94, -0.10, 0.06, 0.04, 0.06);
-  // Sword hilt poking out of the scabbard
-  addBox(verts, colors, idx, new THREE.Color(0x3a2a1a), -0.34, 1.04, -0.10, 0.025, 0.10, 0.025);
-  addBox(verts, colors, idx, new THREE.Color(0xc9a44a), -0.34, 1.16, -0.10, 0.10, 0.025, 0.04);
-  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), -0.34, 1.21, -0.10, 0.030, 0.030, 0.030);
-  // Hair fringe — short bangs under the helmet brim (skip for skeletons or beard races since beard already hints hair)
-  if (!opts.bald) {
-    const hairCol = new THREE.Color(opts.hair != null ? opts.hair : 0x4a2a14);
-    addBox(verts, colors, idx, hairCol, -0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
-    addBox(verts, colors, idx, hairCol,  0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
-    addBox(verts, colors, idx, hairCol,  0.0,  1.93, 0.225, 0.05, 0.04, 0.02);
-  }
-  // Pauldron rim — gold edge around each pauldron
-  const rimGold = new THREE.Color(0xfff5b8);
-  addBox(verts, colors, idx, rimGold, -0.46, 1.66, 0.02, 0.10, 0.012, 0.16);
-  addBox(verts, colors, idx, rimGold,  0.46, 1.66, 0.12, 0.10, 0.012, 0.16);
-  // Boot top cuffs
-  const cuffCol = new THREE.Color(0xc9a44a);
-  addBox(verts, colors, idx, cuffCol, -0.22, 0.16, 0.40, 0.10, 0.025, 0.08);
-  addBox(verts, colors, idx, cuffCol,  0.18, 0.16, -0.16, 0.10, 0.025, 0.08);
-  // Abdominal segment plates — 3 horizontal strips above the belt
-  const abCol = colorOf(palette, 'armor');
-  const abShade = new THREE.Color(abCol.r * 0.85, abCol.g * 0.85, abCol.b * 0.85);
-  addBox(verts, colors, idx, abShade, 0.0, 1.18, 0.31, 0.20, 0.025, 0.02);
-  addBox(verts, colors, idx, abShade, 0.0, 1.13, 0.31, 0.18, 0.025, 0.02);
-  // Pectoral split — vertical seam down the middle of the chest plate
-  const seam = new THREE.Color(abCol.r * 0.7, abCol.g * 0.7, abCol.b * 0.7);
-  addBox(verts, colors, idx, seam, 0.0, 1.45, 0.33, 0.012, 0.20, 0.014);
-  // Pec definition — two slightly-raised plates on either side of the chest seam
-  const pecCol = new THREE.Color(abCol.r * 1.1, abCol.g * 1.1, abCol.b * 1.1);
-  addBox(verts, colors, idx, pecCol, -0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
-  addBox(verts, colors, idx, pecCol,  0.16, 1.50, 0.32, 0.10, 0.10, 0.020);
-  // Cape clasps — gold discs at each shoulder where the cape attaches
-  const clasp = new THREE.Color(0xfff5b8);
-  addBox(verts, colors, idx, clasp, -0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
-  addBox(verts, colors, idx, clasp,  0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
-  // Fists at end of each arm (left arm hangs at side, right arm grips axe)
-  const fistCol = colorOf(palette, 'gauntlet');
-  addBox(verts, colors, idx, fistCol, -0.45, 0.74, 0.32, 0.06, 0.07, 0.06);
-  addBox(verts, colors, idx, fistCol,  0.60, 1.02, 0.72, 0.06, 0.07, 0.06);
-  // Knuckle ridges on each fist
-  const knuckle = new THREE.Color(0x404048);
-  for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) {
-    const handX = sx === -1 ? -0.45 : 0.60;
-    const handY = sx === -1 ? 0.74 : 1.02;
-    const handZ = sx === -1 ? 0.32 : 0.72;
-    addBox(verts, colors, idx, knuckle, handX, handY + 0.04, handZ + 0.05 - i * 0.025, 0.05, 0.012, 0.008);
-  }
-  // Axe haft leather grip — darker wrap near the hand
-  const grip = new THREE.Color(0x33231a);
-  addBox(verts, colors, idx, grip, 0.60, 1.06, 0.70, 0.05, 0.10, 0.05);
-  // Eyebrows above each eye
-  const browCol = new THREE.Color(opts.beardColor != null ? opts.beardColor : 0x3a2010);
-  addBox(verts, colors, idx, browCol, -0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
-  addBox(verts, colors, idx, browCol,  0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
+  buildBodyDetails(verts, colors, idx, palette, opts);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
