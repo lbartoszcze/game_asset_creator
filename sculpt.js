@@ -197,6 +197,24 @@ export function sculptHumanoid(opts = {}) {
     addBox(verts, colors, idx, horn, -0.30, 2.18, -0.04, 0.025, 0.18, 0.03);
     addBox(verts, colors, idx, horn,  0.30, 2.18, -0.04, 0.025, 0.18, 0.03);
   }
+  // Bigger toe caps on boots (chunky stylized look)
+  const toeCol = new THREE.Color(0x161616);
+  addBox(verts, colors, idx, toeCol, -0.25, 0.06, 0.62, 0.14, 0.08, 0.10);
+  addBox(verts, colors, idx, toeCol,  0.20, 0.06, -0.24, 0.14, 0.08, 0.10);
+  // Knee armor highlight (gold trim circle)
+  const kneeRim = new THREE.Color(0xfff5b8);
+  addBox(verts, colors, idx, kneeRim, -0.24, 0.42, 0.36, 0.12, 0.014, 0.04);
+  addBox(verts, colors, idx, kneeRim,  0.20, 0.42, -0.16, 0.12, 0.014, 0.04);
+  // Spaulder studs — three rivets along the front edge of each pauldron
+  const stud = new THREE.Color(0x8a6a1a);
+  for (let i = 0; i < 3; i++) {
+    addBox(verts, colors, idx, stud, -0.62 + i * 0.05, 1.70, 0.18, 0.018, 0.018, 0.018);
+    addBox(verts, colors, idx, stud,  0.62 - i * 0.05, 1.70, 0.28, 0.018, 0.018, 0.018);
+  }
+  // Chest plate side panels — vertical strips on each flank
+  const sideArmor = new THREE.Color(colorOf(palette, 'armor').r * 0.85, colorOf(palette, 'armor').g * 0.85, colorOf(palette, 'armor').b * 0.85);
+  addBox(verts, colors, idx, sideArmor, -0.55, 1.40, 0.05, 0.04, 0.20, 0.18);
+  addBox(verts, colors, idx, sideArmor,  0.55, 1.40, 0.05, 0.04, 0.20, 0.18);
   // Helmet side medallions on cheek guards
   const medallion = new THREE.Color(0xfff5b8);
   addBox(verts, colors, idx, medallion, -0.246, 1.96, 0.18, 0.014, 0.030, 0.030);
