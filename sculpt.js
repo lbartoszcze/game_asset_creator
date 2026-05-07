@@ -215,6 +215,24 @@ export function sculptHumanoid(opts = {}) {
   const sideArmor = new THREE.Color(colorOf(palette, 'armor').r * 0.85, colorOf(palette, 'armor').g * 0.85, colorOf(palette, 'armor').b * 0.85);
   addBox(verts, colors, idx, sideArmor, -0.55, 1.40, 0.05, 0.04, 0.20, 0.18);
   addBox(verts, colors, idx, sideArmor,  0.55, 1.40, 0.05, 0.04, 0.20, 0.18);
+  // Boot leather straps (horizontal cross-tie)
+  const strapCol = new THREE.Color(0x3a2a1a);
+  addBox(verts, colors, idx, strapCol, -0.25, 0.10, 0.42, 0.32, 0.018, 0.32);
+  addBox(verts, colors, idx, strapCol,  0.20, 0.10, -0.13, 0.32, 0.018, 0.32);
+  // Strap buckles (small gold squares)
+  addBox(verts, colors, idx, new THREE.Color(0xc9a44a), -0.25, 0.10, 0.58, 0.018, 0.025, 0.025);
+  addBox(verts, colors, idx, new THREE.Color(0xc9a44a),  0.20, 0.10, 0.03, 0.018, 0.025, 0.025);
+  // Spine / back ridge (vertical raised line down the back of the chest plate)
+  addBox(verts, colors, idx, sideArmor, 0.0, 1.40, -0.30, 0.025, 0.30, 0.04);
+  // Helmet rivets (4 small studs around the dome)
+  const helmRivet = new THREE.Color(0x3a3a3a);
+  for (let i = 0; i < 4; i++) {
+    const a = i * Math.PI / 2 + Math.PI / 4;
+    addBox(verts, colors, idx, helmRivet, Math.cos(a) * 0.20, 2.16, Math.sin(a) * 0.20 + 0.04, 0.018, 0.018, 0.018);
+  }
+  // Belt large center buckle (replace small one with bigger gold square)
+  addBox(verts, colors, idx, new THREE.Color(0xfff5b8), 0.0, 1.04, 0.36, 0.07, 0.05, 0.012);
+  addBox(verts, colors, idx, new THREE.Color(0xc9a44a), 0.0, 1.04, 0.355, 0.06, 0.04, 0.022);
   // Helmet side medallions on cheek guards
   const medallion = new THREE.Color(0xfff5b8);
   addBox(verts, colors, idx, medallion, -0.246, 1.96, 0.18, 0.014, 0.030, 0.030);
