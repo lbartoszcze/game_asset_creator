@@ -25,14 +25,24 @@ const HEAD_RINGS = [
   { y: 2.30, r: 0.10, c: 'helmet' },
 ];
 
-const ARM_PATH = [
-  { r: 0.18, c: 'armor', p: [-0.48, 1.66, 0.0] },
-  { r: 0.16, c: 'armor', p: [-0.52, 1.50, 0.04] },
-  { r: 0.14, c: 'skin',  p: [-0.52, 1.32, 0.08] },
-  { r: 0.12, c: 'skin',  p: [-0.50, 1.16, 0.14] },
-  { r: 0.11, c: 'skin',  p: [-0.48, 1.00, 0.20] },
+const ARM_PATH_LEFT = [
+  { r: 0.18, c: 'armor',    p: [-0.48, 1.66, 0.00] },
+  { r: 0.16, c: 'armor',    p: [-0.52, 1.50, 0.04] },
+  { r: 0.14, c: 'skin',     p: [-0.52, 1.32, 0.08] },
+  { r: 0.12, c: 'skin',     p: [-0.50, 1.16, 0.14] },
+  { r: 0.11, c: 'skin',     p: [-0.48, 1.00, 0.20] },
   { r: 0.13, c: 'gauntlet', p: [-0.46, 0.86, 0.26] },
-  { r: 0.10, c: 'skin',  p: [-0.44, 0.78, 0.30] },
+  { r: 0.10, c: 'skin',     p: [-0.44, 0.78, 0.30] },
+];
+
+const ARM_PATH_RIGHT = [
+  { r: 0.18, c: 'armor',    p: [ 0.48, 1.66, 0.00] },
+  { r: 0.16, c: 'armor',    p: [ 0.50, 1.55, 0.10] },
+  { r: 0.14, c: 'skin',     p: [ 0.52, 1.42, 0.22] },
+  { r: 0.12, c: 'skin',     p: [ 0.54, 1.30, 0.36] },
+  { r: 0.11, c: 'skin',     p: [ 0.56, 1.20, 0.50] },
+  { r: 0.13, c: 'gauntlet', p: [ 0.58, 1.12, 0.62] },
+  { r: 0.10, c: 'skin',     p: [ 0.60, 1.06, 0.70] },
 ];
 
 const LEG_PATH = [
@@ -129,6 +139,48 @@ function addBrow(verts, colors, idx, palette) {
   }
 }
 
+function buildAxe(verts, colors, idx, palette) {
+  // The right hand ends at world (0.60, 1.06, 0.70). Place the axe so the haft
+  // passes through the hand and the head (blade) extends outward.
+  const HX = 0.60, HY = 1.06, HZ = 0.70;
+  const haftCol = colorOf(palette, 'belt'); // dark wood
+  const bladeCol = colorOf(palette, 'gauntlet'); // metal
+  const haftSeg = 12;
+  // Haft: 7 cross-section rings along a diagonal from down-back to up-forward
+  const haftRings = [];
+  for (let i = 0; i <= 6; i++) {
+    const t = i / 6;
+    const cx = HX + (t - 0.5) * 0.08;
+    const cy = HY - 0.40 + t * 0.80;
+    const cz = HZ + (t - 0.5) * 0.30;
+    const start = verts.length / 3;
+    for (let j = 0; j < haftSeg; j++) {
+      const a = (j / haftSeg) * Math.PI * 2;
+      verts.push(cx + Math.cos(a) * 0.04, cy, cz + Math.sin(a) * 0.04);
+      colors.push(haftCol.r, haftCol.g, haftCol.b);
+    }
+    haftRings.push(start);
+  }
+  for (let i = 0; i < haftRings.length - 1; i++) stitchRings(idx, haftRings[i], haftRings[i + 1], haftSeg);
+  // Blade: a wedge attached near the top of the haft. 4 vertices per side, 2 quads + 2 triangle caps.
+  const topY = HY + 0.40, topX = HX + 0.13, topZ = HZ + 0.20;
+  const v0 = verts.length / 3;
+  const blade = [
+    [topX - 0.06, topY - 0.16, topZ + 0.04], [topX + 0.34, topY - 0.06, topZ + 0.18],
+    [topX + 0.34, topY + 0.10, topZ + 0.20], [topX - 0.06, topY + 0.16, topZ + 0.06],
+    [topX - 0.06, topY - 0.16, topZ - 0.04], [topX + 0.34, topY - 0.06, topZ + 0.10],
+    [topX + 0.34, topY + 0.10, topZ + 0.12], [topX - 0.06, topY + 0.16, topZ - 0.02],
+  ];
+  for (const [x, y, z] of blade) { verts.push(x, y, z); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
+  // 2 large faces (front + back) and 4 thin edges as triangle pairs
+  idx.push(v0+0, v0+1, v0+2,  v0+0, v0+2, v0+3);   // front face
+  idx.push(v0+5, v0+4, v0+7,  v0+5, v0+7, v0+6);   // back face
+  idx.push(v0+1, v0+5, v0+6,  v0+1, v0+6, v0+2);   // outer edge (top)
+  idx.push(v0+4, v0+0, v0+3,  v0+4, v0+3, v0+7);   // inner edge (haft side)
+  idx.push(v0+3, v0+2, v0+6,  v0+3, v0+6, v0+7);   // top edge
+  idx.push(v0+4, v0+5, v0+1,  v0+4, v0+1, v0+0);   // bottom edge
+}
+
 function paletteFor(opts) {
   const skin = new THREE.Color(opts.skin != null ? opts.skin : 0xd9b48a);
   const armor = new THREE.Color(opts.armor != null ? opts.armor : 0xc9a44a);
@@ -146,11 +198,12 @@ export function sculptHumanoid(opts = {}) {
   const verts = []; const colors = []; const idx = [];
   buildTorso(verts, colors, idx, palette);
   buildHead(verts, colors, idx, palette);
-  buildLimb(verts, colors, idx, palette, ARM_PATH, false, 'gauntlet');
-  buildLimb(verts, colors, idx, palette, ARM_PATH, true, 'gauntlet');
+  buildLimb(verts, colors, idx, palette, ARM_PATH_LEFT, false, 'gauntlet');
+  buildLimb(verts, colors, idx, palette, ARM_PATH_RIGHT, false, 'gauntlet');
   buildLimb(verts, colors, idx, palette, LEG_PATH, false, 'boot');
   buildLimb(verts, colors, idx, palette, LEG_PATH, true, 'boot');
   addBrow(verts, colors, idx, palette);
+  buildAxe(verts, colors, idx, palette);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
