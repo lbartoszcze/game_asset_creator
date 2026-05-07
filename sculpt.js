@@ -199,23 +199,29 @@ function buildAxe(verts, colors, idx, palette) {
     haftRings.push(start);
   }
   for (let i = 0; i < haftRings.length - 1; i++) stitchRings(idx, haftRings[i], haftRings[i + 1], haftSeg);
-  // Blade: a wedge attached near the top of the haft. 4 vertices per side, 2 quads + 2 triangle caps.
-  const topY = HY + 0.40, topX = HX + 0.13, topZ = HZ + 0.20;
-  const v0 = verts.length / 3;
-  const blade = [
-    [topX - 0.06, topY - 0.16, topZ + 0.04], [topX + 0.34, topY - 0.06, topZ + 0.18],
-    [topX + 0.34, topY + 0.10, topZ + 0.20], [topX - 0.06, topY + 0.16, topZ + 0.06],
-    [topX - 0.06, topY - 0.16, topZ - 0.04], [topX + 0.34, topY - 0.06, topZ + 0.10],
-    [topX + 0.34, topY + 0.10, topZ + 0.12], [topX - 0.06, topY + 0.16, topZ - 0.02],
+  // Axe head: a recognizable single-bit axe profile — narrow at the haft, flaring out to a curved blade.
+  // Profile is a polygon in the plane perpendicular to the haft, then extruded both sides for thickness.
+  const HEAD_X = HX + 0.16, HEAD_Y = HY + 0.45, HEAD_Z = HZ + 0.28;
+  const profile = [
+    [-0.04, -0.10], [ 0.04, -0.18], [ 0.20, -0.20], [ 0.36, -0.14],
+    [ 0.42, -0.04], [ 0.44,  0.06], [ 0.40,  0.16], [ 0.30,  0.22],
+    [ 0.16,  0.22], [ 0.04,  0.18], [-0.04,  0.10],
   ];
-  for (const [x, y, z] of blade) { verts.push(x, y, z); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
-  // 2 large faces (front + back) and 4 thin edges as triangle pairs
-  idx.push(v0+0, v0+1, v0+2,  v0+0, v0+2, v0+3);   // front face
-  idx.push(v0+5, v0+4, v0+7,  v0+5, v0+7, v0+6);   // back face
-  idx.push(v0+1, v0+5, v0+6,  v0+1, v0+6, v0+2);   // outer edge (top)
-  idx.push(v0+4, v0+0, v0+3,  v0+4, v0+3, v0+7);   // inner edge (haft side)
-  idx.push(v0+3, v0+2, v0+6,  v0+3, v0+6, v0+7);   // top edge
-  idx.push(v0+4, v0+5, v0+1,  v0+4, v0+1, v0+0);   // bottom edge
+  const v0 = verts.length / 3;
+  const thickness = 0.06;
+  for (const [u, w] of profile) { verts.push(HEAD_X + u, HEAD_Y + w, HEAD_Z + thickness); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
+  for (const [u, w] of profile) { verts.push(HEAD_X + u, HEAD_Y + w, HEAD_Z - thickness); colors.push(bladeCol.r, bladeCol.g, bladeCol.b); }
+  const N = profile.length;
+  // Front face triangle fan
+  for (let i = 1; i < N - 1; i++) idx.push(v0, v0 + i, v0 + i + 1);
+  // Back face (reverse winding)
+  for (let i = 1; i < N - 1; i++) idx.push(v0 + N, v0 + N + i + 1, v0 + N + i);
+  // Side strips
+  for (let i = 0; i < N; i++) {
+    const j = (i + 1) % N;
+    idx.push(v0 + i, v0 + N + i, v0 + j);
+    idx.push(v0 + j, v0 + N + i, v0 + N + j);
+  }
 }
 
 function paletteFor(opts) {
