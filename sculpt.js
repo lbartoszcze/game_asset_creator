@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 // Each ring is { y, rx, rz, dx } — height, half-width X, half-depth Z, lateral offset.
 // SEG = vertices per ring. Higher = smoother circumference.
-const SEG = 24;
+const SEG = 40;
 
 const TORSO_RINGS = [
   { y: 0.95, rx: 0.16, rz: 0.13 },
