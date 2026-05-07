@@ -269,6 +269,25 @@ export function sculptHumanoid(opts = {}) {
   const clasp = new THREE.Color(0xfff5b8);
   addBox(verts, colors, idx, clasp, -0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
   addBox(verts, colors, idx, clasp,  0.30, 1.78, -0.12, 0.04, 0.04, 0.025);
+  // Fists at end of each arm (left arm hangs at side, right arm grips axe)
+  const fistCol = colorOf(palette, 'gauntlet');
+  addBox(verts, colors, idx, fistCol, -0.45, 0.74, 0.32, 0.06, 0.07, 0.06);
+  addBox(verts, colors, idx, fistCol,  0.60, 1.02, 0.72, 0.06, 0.07, 0.06);
+  // Knuckle ridges on each fist
+  const knuckle = new THREE.Color(0x404048);
+  for (const sx of [-1, 1]) for (let i = 0; i < 4; i++) {
+    const handX = sx === -1 ? -0.45 : 0.60;
+    const handY = sx === -1 ? 0.74 : 1.02;
+    const handZ = sx === -1 ? 0.32 : 0.72;
+    addBox(verts, colors, idx, knuckle, handX, handY + 0.04, handZ + 0.05 - i * 0.025, 0.05, 0.012, 0.008);
+  }
+  // Axe haft leather grip — darker wrap near the hand
+  const grip = new THREE.Color(0x33231a);
+  addBox(verts, colors, idx, grip, 0.60, 1.06, 0.70, 0.05, 0.10, 0.05);
+  // Eyebrows above each eye
+  const browCol = new THREE.Color(opts.beardColor != null ? opts.beardColor : 0x3a2010);
+  addBox(verts, colors, idx, browCol, -0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
+  addBox(verts, colors, idx, browCol,  0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
   const geom = new THREE.BufferGeometry();
   geom.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
   geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
