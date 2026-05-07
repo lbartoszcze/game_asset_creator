@@ -78,17 +78,20 @@ export function buildArmorDetails(verts, colors, idx, palette, opts) {
 export function buildBodyDetails(verts, colors, idx, palette, opts) {
   const C = (h) => new THREE.Color(h);
   const helm = palette.helmet, boot = palette.boot, belt = palette.belt, gaunt = palette.gauntlet, armor = palette.armor;
-  // Helmet
-  addBox(verts, colors, idx, C(0x1a1a1f), 0.0, 2.06, 0.235, 0.18, 0.018, 0.018);
-  addBox(verts, colors, idx, C(0x6a2010), 0.0, 2.34, 0.0, 0.025, 0.05, 0.20);
-  addBox(verts, colors, idx, helm, -0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
-  addBox(verts, colors, idx, helm,  0.21, 1.96, 0.10, 0.025, 0.10, 0.10);
-  addBox(verts, colors, idx, C(0x3a2a1a), 0.0, 1.80, 0.18, 0.18, 0.02, 0.02);
-  addBox(verts, colors, idx, new THREE.Color(helm.r * 1.05, helm.g * 1.05, helm.b * 1.05), 0.0, 2.06, 0.245, 0.20, 0.06, 0.018);
-  addBox(verts, colors, idx, helm, 0.0, 2.06, 0.262, 0.012, 0.10, 0.018);
-  addBox(verts, colors, idx, helm, -0.225, 2.04, -0.04, 0.018, 0.12, 0.10);
-  addBox(verts, colors, idx, helm,  0.225, 2.04, -0.04, 0.018, 0.12, 0.10);
-  addBox(verts, colors, idx, helm, 0.0, 1.91, 0.0, 0.245, 0.020, 0.245);
+  // Helmet — solid face plate covers eyes, leaving only narrow visor slot
+  // Face plate (covers entire front of face, slightly forward)
+  addBox(verts, colors, idx, helm, 0.0, 2.02, 0.245, 0.22, 0.12, 0.02);
+  // Visor slot (dark horizontal cut where eyes peek through)
+  addBox(verts, colors, idx, C(0x0a0a10), 0.0, 2.06, 0.260, 0.16, 0.02, 0.018);
+  // Vertical brow ridge dividing the visor
+  addBox(verts, colors, idx, helm, 0.0, 2.06, 0.275, 0.014, 0.10, 0.014);
+  // Helmet crest (red plume strip front-to-back along top)
+  addBox(verts, colors, idx, C(0x8a1a1a), 0.0, 2.34, 0.04, 0.025, 0.05, 0.22);
+  // Cheek guards extending forward
+  addBox(verts, colors, idx, helm, -0.22, 1.96, 0.14, 0.025, 0.10, 0.10);
+  addBox(verts, colors, idx, helm,  0.22, 1.96, 0.14, 0.025, 0.10, 0.10);
+  // Helmet skirt (neck guard ring just below helmet)
+  addBox(verts, colors, idx, helm, 0.0, 1.88, 0.02, 0.245, 0.022, 0.245);
   // Boots
   addBox(verts, colors, idx, boot, -0.23, 0.04, 0.56, 0.10, 0.06, 0.10);
   addBox(verts, colors, idx, boot,  0.18, 0.04, -0.20, 0.10, 0.06, 0.10);
@@ -112,13 +115,6 @@ export function buildBodyDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, C(0x3a2a1a), -0.34, 1.04, -0.10, 0.025, 0.10, 0.025);
   addBox(verts, colors, idx, C(0xc9a44a), -0.34, 1.16, -0.10, 0.10, 0.025, 0.04);
   addBox(verts, colors, idx, C(0xfff5b8), -0.34, 1.21, -0.10, 0.030, 0.030, 0.030);
-  // Hair fringe
-  if (!opts.bald) {
-    const hairCol = C(opts.hair != null ? opts.hair : 0x4a2a14);
-    addBox(verts, colors, idx, hairCol, -0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
-    addBox(verts, colors, idx, hairCol,  0.10, 1.93, 0.215, 0.06, 0.04, 0.02);
-    addBox(verts, colors, idx, hairCol,  0.0,  1.93, 0.225, 0.05, 0.04, 0.02);
-  }
   // Pauldron rim + cape clasps
   addBox(verts, colors, idx, C(0xfff5b8), -0.58, 1.66, 0.02, 0.14, 0.012, 0.18);
   addBox(verts, colors, idx, C(0xfff5b8),  0.58, 1.66, 0.12, 0.14, 0.012, 0.18);
@@ -137,9 +133,6 @@ export function buildBodyDetails(verts, colors, idx, palette, opts) {
   addBox(verts, colors, idx, gaunt,  0.70, 0.94, 0.74, 0.10, 0.10, 0.10);
   for (const [hx, hy, hz] of [[-0.50, 0.70, 0.36], [0.70, 0.94, 0.74]]) for (let i = 0; i < 4; i++) addBox(verts, colors, idx, C(0x404048), hx, hy + 0.06, hz + 0.06 - i * 0.030, 0.08, 0.014, 0.010);
   addBox(verts, colors, idx, C(0x33231a), 0.70, 1.00, 0.72, 0.07, 0.12, 0.07);
-  const browCol = C(opts.beardColor != null ? opts.beardColor : 0x3a2010);
-  addBox(verts, colors, idx, browCol, -0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
-  addBox(verts, colors, idx, browCol,  0.07, 1.99, 0.215, 0.040, 0.012, 0.008);
 }
 
 export function buildCape(verts, colors, idx, opts) {

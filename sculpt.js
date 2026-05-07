@@ -136,22 +136,16 @@ function buildLimb(verts, colors, idx, palette, path, mirrorX, capColorName) {
 }
 
 function addFaceFeatures(verts, colors, idx, palette, opts = {}) {
-  const eye = new THREE.Color(0x101015);
-  const lip = new THREE.Color(0x6a2010);
-  const nose = colorOf(palette, 'skin');
-  addBox(verts, colors, idx, eye, -0.07, 1.96, 0.215, 0.022, 0.020, 0.012);
-  addBox(verts, colors, idx, eye,  0.07, 1.96, 0.215, 0.022, 0.020, 0.012);
-  addBox(verts, colors, idx, nose, 0.0, 1.92, 0.225, 0.030, 0.050, 0.025);
-  addBox(verts, colors, idx, lip, 0.0, 1.84, 0.215, 0.050, 0.014, 0.010);
+  // Glowing eye dots inside the visor slot
+  const eye = new THREE.Color(opts.eyeGlow != null ? opts.eyeGlow : 0xffaa30);
+  addBox(verts, colors, idx, eye, -0.05, 2.06, 0.272, 0.018, 0.014, 0.006);
+  addBox(verts, colors, idx, eye,  0.05, 2.06, 0.272, 0.018, 0.014, 0.006);
   if (opts.beard) {
     const beard = new THREE.Color(opts.beardColor != null ? opts.beardColor : 0x6e3f1f);
-    addBox(verts, colors, idx, beard, 0.00, 1.82, 0.20, 0.18, 0.10, 0.08);
-    addBox(verts, colors, idx, beard, 0.00, 1.72, 0.18, 0.16, 0.08, 0.06);
-  }
-  if (opts.ears) {
-    const earCol = colorOf(palette, 'skin');
-    addBox(verts, colors, idx, earCol, -0.22, 2.00, 0.0, 0.04, 0.10, 0.04);
-    addBox(verts, colors, idx, earCol,  0.22, 2.00, 0.0, 0.04, 0.10, 0.04);
+    // Beard hangs below helmet skirt
+    addBox(verts, colors, idx, beard, 0.00, 1.78, 0.22, 0.18, 0.06, 0.05);
+    addBox(verts, colors, idx, beard, 0.00, 1.72, 0.22, 0.16, 0.06, 0.05);
+    addBox(verts, colors, idx, beard, 0.00, 1.66, 0.20, 0.12, 0.05, 0.04);
   }
 }
 
@@ -193,8 +187,7 @@ export function sculptHumanoid(opts = {}) {
   buildLimb(verts, colors, idx, palette, ARM_PATH_RIGHT, false, 'gauntlet');
   buildLimb(verts, colors, idx, palette, LEG_PATH_LEFT, false, 'boot');
   buildLimb(verts, colors, idx, palette, LEG_PATH_RIGHT, false, 'boot');
-  addBrow(verts, colors, idx, palette);
-  addFaceFeatures(verts, colors, idx, palette, { beard: opts.beard, beardColor: opts.beardColor, ears: opts.ears });
+  addFaceFeatures(verts, colors, idx, palette, { beard: opts.beard, beardColor: opts.beardColor, eyeGlow: opts.eyeGlow });
   buildAxe(verts, colors, idx, colorOf(palette, 'belt'), colorOf(palette, 'gauntlet'));
   buildArmorDetails(verts, colors, idx, palette, opts);
   buildCape(verts, colors, idx, opts);
@@ -208,10 +201,10 @@ export function sculptHumanoid(opts = {}) {
     const z = 0.30 + Math.sin(t * Math.PI) * 0.02;
     addBox(verts, colors, idx, bandolier, x, y, z, 0.04, 0.05, 0.018);
   }
-  // Helmet side medallions
+  // Helmet side medallions on cheek guards
   const medallion = new THREE.Color(0xfff5b8);
-  addBox(verts, colors, idx, medallion, -0.235, 2.10, 0.04, 0.014, 0.030, 0.030);
-  addBox(verts, colors, idx, medallion,  0.235, 2.10, 0.04, 0.014, 0.030, 0.030);
+  addBox(verts, colors, idx, medallion, -0.246, 1.96, 0.18, 0.014, 0.030, 0.030);
+  addBox(verts, colors, idx, medallion,  0.246, 1.96, 0.18, 0.014, 0.030, 0.030);
   // Greave vertical seam (line down the front of each shin plate)
   const greaveSeam = new THREE.Color(0x707378);
   addBox(verts, colors, idx, greaveSeam, -0.23, 0.20, 0.475, 0.012, 0.16, 0.012);
