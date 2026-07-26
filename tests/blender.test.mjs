@@ -144,6 +144,8 @@ test('text2game runs blender postprocess when enabled', async () => {
         events.push(['postprocess', processCode]);
         return { outputPath };
       },
+      // The postprocess seam doesn't write a real GLB — stub the gate.
+      verify: async () => ({ ok: true }),
     },
   );
   assert.equal(result.processedPath, `${dir}/w.processed.glb`);

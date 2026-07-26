@@ -14,6 +14,7 @@ import { runTextToGameJob } from './text2game.js';
 import { McpStdioClient } from './weles.js';
 import { BlenderSession } from './blender.js';
 import { provisionBlender } from './setup.js';
+import { verifyAsset } from './verify.js';
 
 const DEFAULT_CONFIG = new URL('../pipeline.config.json', import.meta.url).pathname;
 
@@ -43,6 +44,7 @@ const USAGE = `usage: node pipeline/cli.js <command> [args]
 
 commands:
   create <prompt> [--race r] [--out dir] [--config path]
+  verify <file.glb> [--config path]   structural + optional render gate
   check-config [--config path]
   weles-tools
   blender-health              MCP handshake + execute_blender_code probe
@@ -107,6 +109,24 @@ async function main() {
       });
       console.log(JSON.stringify(report, null, 2));
       if (!report.healthy) process.exitCode = 1;
+      return;
+    }
+    case 'verify': {
+      const file = positional[0];
+      if (!file) {
+        console.error('error: verify requires a .glb path');
+        process.exitCode = 2;
+        return;
+      }
+      let config = {};
+      try {
+        config = await loadPipelineConfig(configPath);
+      } catch {
+        // config is optional for verify — defaults kick in without it
+      }
+      const report = await verifyAsset(file, config);
+      console.log(JSON.stringify(report, null, 2));
+      if (!report.ok) process.exitCode = 1;
       return;
     }
     case 'help':

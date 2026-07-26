@@ -16,7 +16,8 @@
     "src",
     "assets",
     "pipeline",
-    "pipeline.config.example.json"
+    "pipeline.config.example.json",
+    "SKILL.md"
   ],
   "keywords": [
     "threejs",
@@ -33,6 +34,7 @@
     "setup": "node pipeline/setup.js"
   },
   "bin": {
-    "game-asset-create": "pipeline/cli.js"
+    "game-asset-create": "pipeline/cli.js",
+    "game-asset-mcp": "pipeline/mcp.js"
   }
 }

@@ -10,6 +10,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { WelesBrowserSession } from './weles.js';
 import { postProcessModel } from './blender.js';
+import { verifyAsset } from './verify.js';
 
 export class PipelineError extends Error {
   constructor(message, { step, cause } = {}) {
@@ -102,7 +103,19 @@ export async function runTextToGameJob(job, config, deps = {}) {
         }));
     }
 
-    return { outPath, processedPath, artifactUrl, prompt: job.prompt };
+    // ---- verification gate (default on; a failed asset fails the job) ----
+    const targetPath = processedPath ?? outPath;
+    let verification = null;
+    if (config.verify?.enabled !== false) {
+      const verifyConfig = {
+        verify: { ...(config.verify ?? {}), throwOnFail: true },
+        blender: config.blender,
+      };
+      verification = await step('verify', () =>
+        (deps.verify ?? verifyAsset)(targetPath, verifyConfig));
+    }
+
+    return { outPath, processedPath, artifactUrl, prompt: job.prompt, verification };
   } finally {
     await session.close().catch(() => {});
   }
