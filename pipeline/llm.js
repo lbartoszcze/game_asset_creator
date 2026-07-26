@@ -26,14 +26,24 @@ const DEFAULT_ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 /** Build the model transport from a resolved pipeline config. */
 export function buildCompleter(models = {}, { fetchImpl } = {}) {
   const fetch_ = fetchImpl ?? fetch;
-  if (models.anthropic?.api_key) {
-    return anthropicCompleter(models.anthropic, fetch_);
-  }
+  // Brama (the org model router) is the sanctioned path for model access.
   if (models.brama?.url && models.brama?.key) {
     return bramaCompleter(models.brama, fetch_);
   }
+  // Direct provider APIs are NOT enabled by configuration alone: nobody is
+  // allowed to spend a vault-held key on this pipeline without the key
+  // owner's explicit consent recorded in the config itself.
+  if (models.anthropic?.api_key) {
+    if (models.anthropic.consent !== true) {
+      throw new LlmError(
+        'direct Anthropic API requires the key owner\'s explicit consent — ' +
+          'set models.anthropic.consent: true in pipeline.config.json, or use models.brama',
+      );
+    }
+    return anthropicCompleter(models.anthropic, fetch_);
+  }
   throw new LlmError(
-    'no model backend configured — set models.anthropic.api_key or models.brama.url+key ' +
+    'no model backend configured — set models.brama.url+key ' +
       '(skarbiec:// references in pipeline.config.json)',
   );
 }

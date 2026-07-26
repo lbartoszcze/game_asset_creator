@@ -142,7 +142,7 @@ test('buildCompleter: anthropic request shape (fake fetch)', async () => {
     };
   };
   const complete = buildCompleter(
-    { anthropic: { api_key: 'sk-test', model: 'claude-opus-4-6' } },
+    { anthropic: { api_key: 'sk-test', model: 'claude-opus-4-6', consent: true } },
     { fetchImpl },
   );
   const reply = await complete({ system: 's', messages: [{ role: 'user', content: 'hi' }] });
@@ -183,4 +183,25 @@ test('buildCompleter: brama router shape (fake fetch)', async () => {
 
 test('buildCompleter: no backend configured throws', () => {
   assert.throws(() => buildCompleter({}), LlmError);
+});
+
+test('buildCompleter: direct Anthropic without recorded consent is refused', () => {
+  assert.throws(
+    () => buildCompleter({ anthropic: { api_key: 'sk-test' } }),
+    (error) => error instanceof LlmError && /consent/.test(error.message),
+  );
+  // ...and Brama wins when both are configured (sanctioned path first).
+  const complete = buildCompleter(
+    {
+      anthropic: { api_key: 'sk-test' },
+      brama: { url: 'https://r.example', key: 'k' },
+    },
+    {
+      fetchImpl: async () => ({
+        ok: true,
+        json: async () => ({ choices: [{ message: { content: '{}' } }] }),
+      }),
+    },
+  );
+  assert.equal(typeof complete, 'function');
 });

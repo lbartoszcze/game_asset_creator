@@ -22,6 +22,10 @@ Two halves:
    local Chromium/profile.
 3. **Blender**: only via a Blender MCP server (`uvx blender-mcp` default),
    never hand-rolled sockets.
+4. **Model access**: ONLY via Brama (the org model router). Direct provider
+   APIs (Anthropic etc.) are refused by the code unless the key owner
+   records explicit consent in the config (`models.anthropic.consent: true`).
+   Nobody has given that consent for this pipeline as of writing.
 
 ## Setup (once per machine)
 
