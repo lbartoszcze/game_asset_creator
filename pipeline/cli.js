@@ -12,6 +12,8 @@
 import { loadPipelineConfig } from './config.js';
 import { runTextToGameJob } from './text2game.js';
 import { McpStdioClient } from './weles.js';
+import { BlenderSession } from './blender.js';
+import { provisionBlender } from './setup.js';
 
 const DEFAULT_CONFIG = new URL('../pipeline.config.json', import.meta.url).pathname;
 
@@ -43,9 +45,12 @@ commands:
   create <prompt> [--race r] [--out dir] [--config path]
   check-config [--config path]
   weles-tools
+  blender-health              MCP handshake + execute_blender_code probe
+  setup [--check] [--dry-run] provision Blender + uv + blender-mcp
 
 credentials come only from skarbiec:// references in the config;
-browser automation goes only through the Weles MCP server.`;
+browser automation goes only through the Weles MCP server;
+Blender work goes only through the Blender MCP server.`;
 
 async function main() {
   const { command, positional, options } = parseArgs(process.argv.slice(2));
@@ -84,6 +89,24 @@ async function main() {
       const tools = await client.listTools();
       for (const tool of tools) console.log(`${tool.name} — ${tool.description ?? ''}`);
       await client.close();
+      return;
+    }
+    case 'blender-health': {
+      const session = await BlenderSession.start({});
+      const healthy = await session.isHealthy();
+      const tools = await session.listTools().catch(() => []);
+      console.log(JSON.stringify({ healthy, tools: tools.map((t) => t.name) }, null, 2));
+      await session.close();
+      process.exitCode = healthy ? 0 : 1;
+      return;
+    }
+    case 'setup': {
+      const report = await provisionBlender({
+        checkOnly: Boolean(options.check),
+        dryRun: Boolean(options['dry-run']),
+      });
+      console.log(JSON.stringify(report, null, 2));
+      if (!report.healthy) process.exitCode = 1;
       return;
     }
     case 'help':

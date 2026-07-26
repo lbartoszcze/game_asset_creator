@@ -9,6 +9,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { WelesBrowserSession } from './weles.js';
+import { postProcessModel } from './blender.js';
 
 export class PipelineError extends Error {
   constructor(message, { step, cause } = {}) {
@@ -88,7 +89,20 @@ export async function runTextToGameJob(job, config, deps = {}) {
     const bytes = await step('artifact:download', () => download(artifactUrl, config));
     await writeFile(outPath, bytes);
 
-    return { outPath, artifactUrl, prompt: job.prompt };
+    // ---- optional Blender post-processing (remesh/decimate/rig) ----
+    let processedPath = null;
+    if (config.blender?.enabled) {
+      processedPath = join(outDir, filename.replace(/\.glb$/i, '.processed.glb'));
+      await step('blender:postprocess', () =>
+        (deps.postProcess ?? postProcessModel)({
+          inputPath: outPath,
+          outputPath: processedPath,
+          processCode: config.blender.processCode,
+          sessionOptions: config.blender.mcp,
+        }));
+    }
+
+    return { outPath, processedPath, artifactUrl, prompt: job.prompt };
   } finally {
     await session.close().catch(() => {});
   }

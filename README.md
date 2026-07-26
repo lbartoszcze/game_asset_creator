@@ -117,3 +117,28 @@ npm test
   (selectors/URLs are config-driven)
 - `pipeline/cli.js` — `create` / `check-config` / `weles-tools`
 - `tests/` — node:test suite with fake vault + fake MCP server
+
+### Blender MCP mode (post-processing)
+
+After a GLB lands on disk, an optional Blender step remeshes / decimates /
+rigs / re-exports it. Blender work goes through a **Blender MCP server**
+too — the pipeline never drives Blender over hand-rolled sockets.
+
+```bash
+# automatic provisioning: Blender + uv + blender-mcp (idempotent)
+node pipeline/cli.js setup            # or: npm run setup
+node pipeline/cli.js setup --check    # verify only
+node pipeline/cli.js setup --dry-run  # print the plan
+
+# health probe against the MCP server
+node pipeline/cli.js blender-health
+
+# enable in pipeline.config.json:
+#   "blender": { "enabled": true, "processCode": "<bpy python>" }
+# processCode sees INPUT_PATH / OUTPUT_PATH globals; default spawn is
+# `uvx blender-mcp` (override with blender.mcp.command/args).
+```
+
+With `blender.enabled` the `create` flow writes
+`<name>.processed.glb` next to the downloaded artifact and reports it as
+`processedPath` in the CLI output.
