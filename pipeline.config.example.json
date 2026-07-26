@@ -28,9 +28,8 @@
       "url": "https://model-router-1080673333190.us-central1.run.app",
       "key": "skarbiec://BRAMA/agent_auth_secret",
       "model": "any",
-      "_comment": "Brama (org model router) is the ONLY sanctioned model path."
-    },
-    "anthropic_disabled_note": "Direct Anthropic API is refused unless the key owner records explicit consent in this config: \"anthropic\": {\"api_key\": \"skarbiec://ANTHROPIC_API_KEY/value\", \"model\": \"claude-opus-4-6\", \"consent\": true}"
+      "_comment": "Brama (org model router) is the ONLY model path. There is no direct provider API code in this package."
+    }
   },
   "llm": {
     "maxRounds": 12

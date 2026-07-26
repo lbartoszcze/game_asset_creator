@@ -1,12 +1,11 @@
 // llm.js — model access for the pipeline's LLM loop.
 //
-// Two backends, both fed from the pipeline config (secrets resolved from
-// skarbiec:// refs like everything else — never from env):
-//
-//   models.anthropic: { api_key: "skarbiec://ANTHROPIC/api_key",
-//                       model: "claude-opus-4-6", base_url? }
-//   models.brama:     { url, key: "skarbiec://BRAMA/agent_auth_secret",
-//                       model }                     — OpenAI-compatible router
+// ONE backend, no exceptions: Brama, the org model router
+// (OpenAI-compatible /v1/chat/completions). Credentials come from the
+// pipeline config via skarbiec:// refs like everything else — never
+// from env. There is intentionally NO direct provider API code in this
+// package (no Anthropic/OpenAI/etc. endpoints): the user has explicitly
+// rejected direct provider calls for this pipeline.
 //
 // The transport is one function: complete({ system, messages, maxTokens })
 // → text. Injected as a seam in tests.
@@ -20,59 +19,22 @@ export class LlmError extends Error {
   }
 }
 
-const DEFAULT_ANTHROPIC_MODEL = 'claude-opus-4-6';
-const DEFAULT_ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-
 /** Build the model transport from a resolved pipeline config. */
 export function buildCompleter(models = {}, { fetchImpl } = {}) {
   const fetch_ = fetchImpl ?? fetch;
-  // Brama (the org model router) is the sanctioned path for model access.
+  if (models.anthropic || models.openai || models.direct) {
+    throw new LlmError(
+      'direct provider APIs are not supported in this package — model access goes ' +
+        'only through Brama (models.brama.url + models.brama.key)',
+    );
+  }
   if (models.brama?.url && models.brama?.key) {
     return bramaCompleter(models.brama, fetch_);
-  }
-  // Direct provider APIs are NOT enabled by configuration alone: nobody is
-  // allowed to spend a vault-held key on this pipeline without the key
-  // owner's explicit consent recorded in the config itself.
-  if (models.anthropic?.api_key) {
-    if (models.anthropic.consent !== true) {
-      throw new LlmError(
-        'direct Anthropic API requires the key owner\'s explicit consent — ' +
-          'set models.anthropic.consent: true in pipeline.config.json, or use models.brama',
-      );
-    }
-    return anthropicCompleter(models.anthropic, fetch_);
   }
   throw new LlmError(
     'no model backend configured — set models.brama.url+key ' +
       '(skarbiec:// references in pipeline.config.json)',
   );
-}
-
-function anthropicCompleter(cfg, fetch_) {
-  const model = cfg.model ?? DEFAULT_ANTHROPIC_MODEL;
-  const url = cfg.base_url ?? DEFAULT_ANTHROPIC_URL;
-  return async function complete({ system, messages, maxTokens = 4096 }) {
-    const response = await fetch_(url, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': cfg.api_key,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({ model, max_tokens: maxTokens, system, messages }),
-    });
-    const body = await response.json().catch(() => ({}));
-    if (!response.ok) {
-      throw new LlmError(`anthropic API HTTP ${response.status}: ${body?.error?.message ?? 'unknown'}`, {
-        status: response.status,
-      });
-    }
-    const text = (body.content ?? [])
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text)
-      .join('');
-    return { text, stopReason: body.stop_reason };
-  };
 }
 
 /** OpenAI-compatible chat-completions shape (what model routers like Brama speak). */

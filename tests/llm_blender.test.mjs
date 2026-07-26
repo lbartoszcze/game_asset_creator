@@ -129,29 +129,19 @@ test('parseJsonFrom handles fences and prose', () => {
   assert.throws(() => parseJsonFrom('no object'), LlmError);
 });
 
-test('buildCompleter: anthropic request shape (fake fetch)', async () => {
-  const requests = [];
-  const fetchImpl = async (url, init) => {
-    requests.push({ url, init });
-    return {
-      ok: true,
-      json: async () => ({
-        content: [{ type: 'text', text: '{"done": true, "code": ""}' }],
-        stop_reason: 'end_turn',
-      }),
-    };
-  };
-  const complete = buildCompleter(
-    { anthropic: { api_key: 'sk-test', model: 'claude-opus-4-6', consent: true } },
-    { fetchImpl },
-  );
-  const reply = await complete({ system: 's', messages: [{ role: 'user', content: 'hi' }] });
-  assert.match(reply.text, /done/);
-  assert.equal(requests[0].url, 'https://api.anthropic.com/v1/messages');
-  assert.equal(requests[0].init.headers['x-api-key'], 'sk-test');
-  const body = JSON.parse(requests[0].init.body);
-  assert.equal(body.model, 'claude-opus-4-6');
-  assert.equal(body.system, 's');
+test('buildCompleter: direct provider configs are refused outright', () => {
+  for (const models of [
+    { anthropic: { api_key: 'sk-test', consent: true } },
+    { openai: { api_key: 'sk-test' } },
+    { direct: { api_key: 'sk-test' } },
+  ]) {
+    assert.throws(
+      () => buildCompleter(models),
+      (error) => error instanceof LlmError && /not supported/.test(error.message),
+    );
+  }
+  // A consent flag doesn't revive it — the code path is gone entirely.
+  assert.throws(() => buildCompleter({ anthropic: { api_key: 'x', consent: true } }), LlmError);
 });
 
 test('buildCompleter: brama router shape (fake fetch)', async () => {
@@ -183,25 +173,4 @@ test('buildCompleter: brama router shape (fake fetch)', async () => {
 
 test('buildCompleter: no backend configured throws', () => {
   assert.throws(() => buildCompleter({}), LlmError);
-});
-
-test('buildCompleter: direct Anthropic without recorded consent is refused', () => {
-  assert.throws(
-    () => buildCompleter({ anthropic: { api_key: 'sk-test' } }),
-    (error) => error instanceof LlmError && /consent/.test(error.message),
-  );
-  // ...and Brama wins when both are configured (sanctioned path first).
-  const complete = buildCompleter(
-    {
-      anthropic: { api_key: 'sk-test' },
-      brama: { url: 'https://r.example', key: 'k' },
-    },
-    {
-      fetchImpl: async () => ({
-        ok: true,
-        json: async () => ({ choices: [{ message: { content: '{}' } }] }),
-      }),
-    },
-  );
-  assert.equal(typeof complete, 'function');
 });
