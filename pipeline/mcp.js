@@ -84,6 +84,24 @@ const TOOLS = [
   },
 ];
 
+
+function redactSecrets(node, path = []) {
+  if (Array.isArray(node)) return node.map((v, i) => redactSecrets(v, [...path, i]));
+  if (node && typeof node === 'object') {
+    const out = {};
+    for (const [key, value] of Object.entries(node)) {
+      const inSecretSubtree = path.length > 0 && ['credentials', 'models'].includes(path[0]);
+      if (inSecretSubtree && /(key|secret|token|password)/i.test(key) && typeof value === 'string') {
+        out[key] = '<resolved: ok>';
+      } else {
+        out[key] = redactSecrets(value, [...path, key]);
+      }
+    }
+    return out;
+  }
+  return node;
+}
+
 function textResult(value) {
   const text = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
   return { content: [{ type: 'text', text }] };
@@ -142,9 +160,7 @@ async function callTool(name, args = {}) {
     }
     case 'gac_check_config': {
       const config = await loadPipelineConfig(configPath);
-      const redacted = JSON.parse(JSON.stringify(config));
-      if (redacted.credentials) redacted.credentials = '<resolved: ok>';
-      return textResult(redacted);
+      return textResult(redactSecrets(config));
     }
     case 'gac_blender_health': {
       const session = await BlenderSession.start({});

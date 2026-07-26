@@ -17,6 +17,24 @@ import { provisionBlender } from './setup.js';
 import { verifyAsset } from './verify.js';
 import { sculptWithLlm } from './llm_blender.js';
 
+
+function redactSecrets(node, path = []) {
+  if (Array.isArray(node)) return node.map((v, i) => redactSecrets(v, [...path, i]));
+  if (node && typeof node === 'object') {
+    const out = {};
+    for (const [key, value] of Object.entries(node)) {
+      const inSecretSubtree = path.length > 0 && ['credentials', 'models'].includes(path[0]);
+      if (inSecretSubtree && /(key|secret|token|password)/i.test(key) && typeof value === 'string') {
+        out[key] = '<resolved: ok>';
+      } else {
+        out[key] = redactSecrets(value, [...path, key]);
+      }
+    }
+    return out;
+  }
+  return node;
+}
+
 const DEFAULT_CONFIG = new URL('../pipeline.config.json', import.meta.url).pathname;
 
 function parseArgs(argv) {
@@ -83,9 +101,7 @@ async function main() {
     }
     case 'check-config': {
       const config = await loadPipelineConfig(configPath);
-      const redacted = JSON.parse(JSON.stringify(config));
-      if (redacted.credentials) redacted.credentials = '<resolved: ok>';
-      console.log(JSON.stringify(redacted, null, 2));
+      console.log(JSON.stringify(redactSecrets(config), null, 2));
       return;
     }
     case 'weles-tools': {
@@ -112,6 +128,25 @@ async function main() {
       });
       console.log(JSON.stringify(report, null, 2));
       if (!report.healthy) process.exitCode = 1;
+      return;
+    }
+    case 'export-config': {
+      // Submit-time secret resolution for REMOTE runs (stado): resolves all
+      // skarbiec:// refs locally (the vault never leaves this host) and
+      // writes a mode-0600 resolved config the worker consumes directly —
+      // the same owner-only-env-file pattern as `skarbiec resolve --emit`.
+      // Nothing secret is printed.
+      const out = options.out;
+      if (!out) {
+        console.error('error: export-config requires --out <path>');
+        process.exitCode = 2;
+        return;
+      }
+      const config = await loadPipelineConfig(configPath);
+      const { writeFile, chmod } = await import('node:fs/promises');
+      await writeFile(out, JSON.stringify({ _resolved: true, ...config }, null, 2));
+      await chmod(out, 0o600);
+      console.log(JSON.stringify({ out, resolved: true }));
       return;
     }
     case 'verify': {

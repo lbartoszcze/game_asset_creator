@@ -28,6 +28,10 @@ function assertNoInlineSecrets(node, path = []) {
     return;
   }
   if (node && typeof node === 'object') {
+    // A resolver-produced file (see `cli.js export-config`) marks itself:
+    // its inline values came FROM the vault at submit time, so the guard
+    // does not apply. Hand-written configs never carry this marker.
+    if (node._resolved === true) return;
     for (const [key, value] of Object.entries(node)) {
       const childPath = [...path, key];
       const inSecretSubtree = path.length > 0 && SECRET_SUBTREES.has(path[0]);
