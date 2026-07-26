@@ -12,6 +12,7 @@ import { runTextToGameJob } from './text2game.js';
 import { verifyAsset } from './verify.js';
 import { BlenderSession } from './blender.js';
 import { McpStdioClient } from './weles.js';
+import { sculptWithLlm } from './llm_blender.js';
 
 const PROTOCOL_VERSION = '2024-11-05';
 const DEFAULT_CONFIG = new URL('../pipeline.config.json', import.meta.url).pathname;
@@ -53,6 +54,22 @@ const TOOLS = [
     inputSchema: {
       type: 'object',
       properties: { config: { type: 'string', description: 'Path to pipeline.config.json' } },
+    },
+  },
+  {
+    name: 'gac_sculpt',
+    description:
+      'LLM-driven Blender sculpting: the model (Opus via Skarbiec-held key or Brama) iteratively writes bpy code, executes it through the Blender MCP session, then exports GLB and runs the verification gate. "Opus wyklepuje" the asset for you.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        prompt: { type: 'string', description: 'What to build, e.g. "gothic dwarven tower, low-poly"' },
+        out_dir: { type: 'string' },
+        filename: { type: 'string' },
+        max_rounds: { type: 'number', description: 'Max LLM iterations (default 12)' },
+        config: { type: 'string', description: 'Path to pipeline.config.json' },
+      },
+      required: ['prompt'],
     },
   },
   {
@@ -106,6 +123,22 @@ async function callTool(name, args = {}) {
         // thresholds fall back to defaults
       }
       return textResult(await verifyAsset(args.path, config));
+    }
+    case 'gac_sculpt': {
+      if (typeof args.prompt !== 'string' || !args.prompt.trim()) {
+        return errorResult('prompt is required');
+      }
+      const config = await loadPipelineConfig(configPath);
+      const result = await sculptWithLlm(
+        {
+          prompt: args.prompt,
+          outDir: args.out_dir,
+          filename: args.filename,
+          maxRounds: args.max_rounds,
+        },
+        config,
+      );
+      return textResult({ ...result, transcript: undefined });
     }
     case 'gac_check_config': {
       const config = await loadPipelineConfig(configPath);

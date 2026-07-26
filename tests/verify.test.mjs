@@ -191,6 +191,7 @@ test('pipeline/mcp.js serves initialize, tools/list and gac_verify_asset', async
       'gac_blender_health',
       'gac_check_config',
       'gac_create_asset',
+      'gac_sculpt',
       'gac_verify_asset',
       'gac_weles_tools',
     ]);

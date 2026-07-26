@@ -142,3 +142,24 @@ node pipeline/cli.js blender-health
 With `blender.enabled` the `create` flow writes
 `<name>.processed.glb` next to the downloaded artifact and reports it as
 `processedPath` in the CLI output.
+
+### LLM sculpt mode ("Opus wyklepuje w Blenderze")
+
+An LLM (Claude Opus via the Anthropic API, or any model through Brama's
+OpenAI-compatible router) iteratively *writes bpy code* to build a model,
+executing each step through the Blender MCP session:
+
+```
+prompt → model writes bpy → execute (Blender MCP) → viewport screenshot
+       → next round … → done → export GLB → verification gate
+```
+
+```bash
+# config: models.anthropic.api_key = "skarbiec://ANTHROPIC/api_key"
+# (or models.brama.{url,key,model} for the router)
+node pipeline/cli.js sculpt "gothic dwarven tower, low-poly" --rounds 12
+```
+
+The loop caps at `llm.maxRounds` (default 12), feeds execution errors back
+to the model, and fails the job if the model doesn't finish or the final
+GLB fails verification. Also exposed as the `gac_sculpt` MCP tool.

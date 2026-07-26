@@ -15,6 +15,7 @@ import { McpStdioClient } from './weles.js';
 import { BlenderSession } from './blender.js';
 import { provisionBlender } from './setup.js';
 import { verifyAsset } from './verify.js';
+import { sculptWithLlm } from './llm_blender.js';
 
 const DEFAULT_CONFIG = new URL('../pipeline.config.json', import.meta.url).pathname;
 
@@ -44,6 +45,8 @@ const USAGE = `usage: node pipeline/cli.js <command> [args]
 
 commands:
   create <prompt> [--race r] [--out dir] [--config path]
+  sculpt <prompt> [--out dir] [--filename f.glb] [--rounds n] [--config path]
+                                  LLM (Opus) iteratively builds the model in Blender
   verify <file.glb> [--config path]   structural + optional render gate
   check-config [--config path]
   weles-tools
@@ -127,6 +130,27 @@ async function main() {
       const report = await verifyAsset(file, config);
       console.log(JSON.stringify(report, null, 2));
       if (!report.ok) process.exitCode = 1;
+      return;
+    }
+    case 'sculpt': {
+      const prompt = positional.join(' ').trim();
+      if (!prompt) {
+        console.error('error: sculpt requires a prompt');
+        process.exitCode = 2;
+        return;
+      }
+      const config = await loadPipelineConfig(configPath);
+      const result = await sculptWithLlm(
+        {
+          prompt,
+          outDir: options.out,
+          filename: options.filename,
+          maxRounds: options.rounds ? Number(options.rounds) : undefined,
+        },
+        config,
+        { onRound: (r) => console.error(`[round ${r.round}] ${r.step.thought ?? ''}`) },
+      );
+      console.log(JSON.stringify({ ...result, transcript: undefined, rounds: result.rounds }, null, 2));
       return;
     }
     case 'help':
