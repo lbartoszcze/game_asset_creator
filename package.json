@@ -1,0 +1,29 @@
+{
+  "name": "game_asset_creator",
+  "version": "0.1.0",
+  "description": "Runtime asset-creation pipeline for simple-rts-unity: procedural character bodies, sculpted humanoids, gear, and card art. No downloaded models — everything is built from THREE.js primitives.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./anatomy": "./src/anatomy.js",
+    "./sculpt": "./src/sculpt.js",
+    "./sculpt-gear": "./sculpt-gear.js",
+    "./card-art": "./src/card-art.js",
+    "./loader": "./src/loader.js"
+  },
+  "files": [
+    "src",
+    "assets"
+  ],
+  "keywords": [
+    "threejs",
+    "procedural-generation",
+    "game-assets",
+    "rts"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "three": ">=0.160.0"
+  }
+}

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { MarchingCubes } from 'https://unpkg.com/three@0.160.0/examples/jsm/objects/MarchingCubes.js';
-import { buildWeaponArm, buildArmorTier } from '../lib/weapons.js';
+import { buildWeaponArm, buildArmorTier } from '../../lib/weapons.js';
 
 const lambert = (color, flat = false) => new THREE.MeshLambertMaterial({ color, flatShading: flat });
 const basic = (color) => new THREE.MeshBasicMaterial({ color });
