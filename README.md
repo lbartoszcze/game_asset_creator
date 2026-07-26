@@ -167,3 +167,11 @@ GLB fails verification. Also exposed as the `gac_sculpt` MCP tool.
 > **Model access note:** Brama (the org model router) is the ONLY model
 > backend. Direct provider API code (Anthropic etc.) was deleted from
 > this package at the user's explicit decision — not gated, gone.
+
+### Tests & evals
+
+Unit tests: `npm test` (package-local, fake vault/MCP/LLM).
+E2E journeys + visual evaluation live in **Probierz** (app
+`game-asset-creator`): CLI/verify journeys in
+`packages/tui/specs/`, Brama-vision asset eval in
+`apps/game-asset-creator/evals/visual-eval.mjs`.

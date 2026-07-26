@@ -87,3 +87,18 @@ Tools: `gac_create_asset` (prompt/race/out_dir/filename/config),
 - `tests/` — node:test (fake vault, fake MCP servers, synthetic GLBs)
 
 Run tests: `npm test` (15+ tests, no real vault/browser/Blender needed).
+
+## Tests & evals live in Probierz
+
+End-to-end journeys and visual evaluation for this package run in
+**Probierz** (`wisent-tester`), registered as app `game-asset-creator`:
+
+- TUI journeys (CLI, verify gate): `packages/tui/specs/game-asset-creator-cli.spec.mjs`
+- Visual eval (Blender-render → Brama-vision rubric):
+  `apps/game-asset-creator/evals/visual-eval.mjs`
+- App config: `apps/game-asset-creator/probierz.yaml`, fixtures in
+  `apps/game-asset-creator/fixtures.mjs` (synthetic GLBs + fake vault)
+
+Package-local unit tests (`npm test` here) stay for fast iteration;
+anything touching a browser, Blender, a model, or a vault belongs in
+Probierz.

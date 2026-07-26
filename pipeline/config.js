@@ -16,6 +16,9 @@ import { isSkarbiecRef, resolveConfigSecrets, SkarbiecError } from './skarbiec.j
 
 const SECRET_KEY_PATTERN = /(token|secret|password|passwd|credential|cookie|api[_-]?key|private[_-]?key)/i;
 
+/** Subtrees where secret VALUES live by contract — only these are guarded. */
+const SECRET_SUBTREES = new Set(['credentials', 'models']);
+
 function assertNoInlineSecrets(node, path = []) {
   if (typeof node === 'string') {
     return;
@@ -26,13 +29,20 @@ function assertNoInlineSecrets(node, path = []) {
   }
   if (node && typeof node === 'object') {
     for (const [key, value] of Object.entries(node)) {
-      if (SECRET_KEY_PATTERN.test(key) && typeof value === 'string' && !isSkarbiecRef(value)) {
+      const childPath = [...path, key];
+      const inSecretSubtree = path.length > 0 && SECRET_SUBTREES.has(path[0]);
+      if (
+        inSecretSubtree &&
+        SECRET_KEY_PATTERN.test(key) &&
+        typeof value === 'string' &&
+        !isSkarbiecRef(value)
+      ) {
         throw new SkarbiecError(
-          `config key '${[...path, key].join('.')}' holds an inline value; ` +
+          `config key '${childPath.join('.')}' holds an inline value; ` +
             `secrets must be skarbiec://<item>/<field> references`,
         );
       }
-      assertNoInlineSecrets(value, [...path, key]);
+      assertNoInlineSecrets(value, childPath);
     }
   }
 }
