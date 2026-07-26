@@ -38,10 +38,19 @@ node pipeline/cli.js blender-health
 ```bash
 node pipeline/cli.js check-config          # validate config + vault refs
 node pipeline/cli.js create "dwarven axe warrior, low-poly" --race dwarves
+node pipeline/cli.js sculpt "gothic dwarven tower, low-poly"   # LLM drives Blender
 node pipeline/cli.js verify assets/models/warrior.glb
 node pipeline/cli.js weles-tools
 node pipeline/cli.js setup [--check|--dry-run]
 ```
+
+## LLM sculpt mode
+
+`sculpt` lets a model (Claude Opus via `models.anthropic.api_key =
+skarbiec://ANTHROPIC/api_key`, or Brama via `models.brama.{url,key,model}`)
+iteratively write bpy code into the Blender MCP session — block out,
+refine, colors — then exports GLB and runs the verification gate. Cap:
+`llm.maxRounds` (default 12). MCP tool: `gac_sculpt`.
 
 `create` flow: login → prompt → poll → download `.glb` → optional Blender
 postprocess (`blender.enabled`, `blender.processCode` sees
@@ -55,8 +64,8 @@ node pipeline/mcp.js        # stdio JSON-RPC MCP, package bin: game-asset-mcp
 ```
 
 Tools: `gac_create_asset` (prompt/race/out_dir/filename/config),
-`gac_verify_asset` (path/config), `gac_check_config`, `gac_blender_health`,
-`gac_weles_tools`.
+`gac_sculpt` (prompt/out_dir/filename/max_rounds/config), `gac_verify_asset`
+(path/config), `gac_check_config`, `gac_blender_health`, `gac_weles_tools`.
 
 ## Verification gate (`verify` in config)
 
