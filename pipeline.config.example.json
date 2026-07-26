@@ -24,9 +24,10 @@
     }
   },
   "models": {
-    "anthropic": {
-      "api_key": "skarbiec://ANTHROPIC/api_key",
-      "model": "claude-opus-4-6"
+    "brama": {
+      "url": "https://model-router-1080673333190.us-central1.run.app",
+      "key": "skarbiec://BRAMA/agent_auth_secret",
+      "model": "any"
     }
   },
   "llm": {

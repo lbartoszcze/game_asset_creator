@@ -163,3 +163,9 @@ node pipeline/cli.js sculpt "gothic dwarven tower, low-poly" --rounds 12
 The loop caps at `llm.maxRounds` (default 12), feeds execution errors back
 to the model, and fails the job if the model doesn't finish or the final
 GLB fails verification. Also exposed as the `gac_sculpt` MCP tool.
+
+> **Model access note:** the default backend is Brama (the org model
+> router). The direct Anthropic API backend exists in code but is NOT
+> enabled by default — nobody has consented to spending the
+> `ANTHROPIC_API_KEY` vault item on this pipeline. Enable it only with
+> the key owner's explicit go-ahead.
