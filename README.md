@@ -65,3 +65,55 @@ serves `web/` as-is.
 Consumers inside the repo: `web/units.js` (game units),
 `web/lib/cards.js` (card UI), `web/demos/tiers.html` (sculpt showcase),
 `web/demos/text2game-real-viewer.html` (reference GLB viewer).
+
+---
+
+# Authoring pipeline (`pipeline/`)
+
+Offline asset *generation* (text→3D) with two hard rules:
+
+1. **Credentials come ONLY from Skarbiec.** Config files carry
+   `skarbiec://<item>/<field>` references; `pipeline/config.js` rejects
+   inline secrets and credential-shaped env vars. Nothing is read from
+   browser profiles, cookie DBs, or key files.
+2. **The browser is driven ONLY through the Weles MCP API** (`weles-mcp`
+   stdio server). The pipeline never launches its own Chromium and never
+   touches a local profile.
+
+## Setup
+
+```sh
+# one-time: put the studio account into the vault
+skarbiec set TEXT2GAME_ACCOUNT --type login \
+  --field login_email=you@example.com --field login_password=...
+
+# configure (all secrets stay as skarbiec:// references)
+cp pipeline.config.example.json pipeline.config.json  # edit URLs/selectors
+```
+
+## Run
+
+```bash
+# validate config + resolve vault refs (no browser)
+node pipeline/cli.js check-config
+
+# generate one asset end-to-end
+node pipeline/cli.js create "dwarven axe warrior, low-poly" --race dwarves
+
+# inspect what the Weles MCP server exposes
+node pipeline/cli.js weles-tools
+
+# tests (fake skarbiec + fake MCP server, no real vault/browser)
+npm test
+```
+
+## Layout
+
+- `pipeline/skarbiec.js` — `skarbiec://` resolver over the vault CLI
+- `pipeline/config.js` — config loader + inline-secret/env guards
+- `pipeline/weles.js` — JSON-RPC stdio client + browser session over
+  the Weles MCP tools (`weles_browser_start`, `weles_page_*`)
+- `pipeline/text2game.js` — login → prompt → poll → download flow
+  (selectors/URLs are config-driven)
+- `pipeline/cli.js` — `create` / `check-config` / `weles-tools`
+- `tests/` — node:test suite with fake vault + fake MCP server

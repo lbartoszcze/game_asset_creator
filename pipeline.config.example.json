@@ -1,0 +1,26 @@
+{
+  "browser": {
+    "engine": "chromium",
+    "headless": true
+  },
+  "credentials": {
+    "username": "skarbiec://TEXT2GAME_ACCOUNT/login_email",
+    "password": "skarbiec://TEXT2GAME_ACCOUNT/login_password"
+  },
+  "studio": {
+    "loginUrl": "https://hunyuan3d.tencent.com/login",
+    "generateUrl": "https://hunyuan3d.tencent.com/studio",
+    "selectors": {
+      "loginUser": "input[type=email]",
+      "loginPassword": "input[type=password]",
+      "loginSubmit": "button[type=submit]",
+      "promptInput": "textarea",
+      "generateSubmit": "button.generate"
+    },
+    "artifact": {
+      "pollExpression": "document.querySelector('a.download-glb')?.href ?? null",
+      "timeoutMs": 300000,
+      "intervalMs": 5000
+    }
+  }
+}

@@ -1,0 +1,3 @@
+node_modules/
+pipeline.config.json
+*.log
