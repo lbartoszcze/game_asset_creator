@@ -11,7 +11,7 @@
 
 import { execFile } from 'node:child_process';
 
-export const SKARBIEC_REF_PATTERN = /^skarbiec:\/\/([A-Za-z0-9._-]+)\/([A-Za-z0-9._-]+)$/;
+export const SKARBIEC_REF_PATTERN = /^skarbiec:\/\/([A-Za-z0-9._:-]+)\/([A-Za-z0-9._-]+)$/;
 
 export class SkarbiecError extends Error {
   constructor(message, { item, field, cause } = {}) {

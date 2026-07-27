@@ -144,7 +144,7 @@ test('buildCompleter: direct provider configs are refused outright', () => {
   assert.throws(() => buildCompleter({ anthropic: { api_key: 'x', consent: true } }), LlmError);
 });
 
-test('buildCompleter: brama router shape (fake fetch)', async () => {
+test('buildCompleter: brama router signs requests (fake fetch)', async () => {
   const requests = [];
   const fetchImpl = async (url, init) => {
     requests.push({ url, init });
@@ -156,7 +156,7 @@ test('buildCompleter: brama router shape (fake fetch)', async () => {
     };
   };
   const complete = buildCompleter(
-    { brama: { url: 'https://router.example/', key: 'k', model: 'any' } },
+    { brama: { url: 'https://router.example/', key: 'hmac-secret', agent_id: 'agent-1', model: 'any' } },
     { fetchImpl },
   );
   await complete({
@@ -166,6 +166,17 @@ test('buildCompleter: brama router shape (fake fetch)', async () => {
     ],
   });
   assert.equal(requests[0].url, 'https://router.example/v1/chat/completions');
+  const headers = requests[0].init.headers;
+  assert.equal(headers['x-agent-id'], 'agent-1');
+  assert.ok(headers['x-agent-timestamp']);
+  assert.equal(headers.authorization, undefined);
+  // Signature must be HMAC-SHA256(secret, "<id>:<ts>:<sha256(body)>").
+  const { createHash, createHmac } = await import('node:crypto');
+  const expectedHash = createHash('sha256').update(requests[0].init.body).digest('hex');
+  const expectedSig = createHmac('sha256', 'hmac-secret')
+    .update(`agent-1:${headers['x-agent-timestamp']}:${expectedHash}`)
+    .digest('hex');
+  assert.equal(headers['x-agent-signature'], expectedSig);
   const body = JSON.parse(requests[0].init.body);
   assert.equal(body.messages[0].role, 'system');
   assert.match(body.messages[1].content, /screenshot attached/);

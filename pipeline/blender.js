@@ -83,21 +83,41 @@ export class BlenderSession {
    * Run Blender Python (`bpy`) inside the connected Blender instance.
    * Returns whatever the MCP tool reports back (usually the captured
    * stdout / last expression value as text).
+   *
+   * The model's code is wrapped in try/except BEFORE sending: the addon's
+   * execute path has a nasty failure mode where an exception escaping the
+   * executed block kills the addon's server thread (every subsequent call
+   * gets "connection refused"). Wrapping turns model bugs into captured
+   * "GAC-EXEC-ERROR" output instead — the error still reaches the model
+   * on the next round, but the session survives.
    */
   async execute(code) {
-    const result = await this.client.callTool('execute_blender_code', { code });
+    const indented = code
+      .split('\n')
+      .map((line) => (line.trim() ? `    ${line}` : ''))
+      .join('\n');
+    const wrapped = [
+      'import traceback as _gac_tb',
+      'try:',
+      indented || '    pass',
+      'except Exception as _gac_e:',
+      '    print("GAC-EXEC-ERROR:", _gac_tb.format_exc())',
+    ].join('\n');
+    const result = await this.client.callTool('execute_blender_code', { code: wrapped });
     return result?.content?.map((c) => c.text ?? '').join('') ?? result;
   }
 
-  /** Convenience: import a model file into the scene. */
+  /** Convenience: import a model file into the scene (data-API scene reset). */
   async importModel(path, format = 'glb') {
     const code = [
       'import bpy',
-      'bpy.ops.wm.read_factory_settings(use_empty=True)',
+      // Data-API cleanup only — read_factory_settings would wipe the
+      // addon's scene properties and kill the MCP server thread.
+      'for obj in list(bpy.data.objects): bpy.data.objects.remove(obj, do_unlink=True)',
       format === 'glb'
         ? `bpy.ops.import_scene.gltf(filepath=${JSON.stringify(path)})`
         : `bpy.ops.wm.obj_import(filepath=${JSON.stringify(path)})`,
-      'print("imported", len(bpy.context.scene.objects), "objects")',
+      'print("imported", len(bpy.data.objects), "objects")',
     ].join('\n');
     return this.execute(code);
   }

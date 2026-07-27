@@ -26,9 +26,10 @@
   "models": {
     "brama": {
       "url": "https://model-router-1080673333190.us-central1.run.app",
-      "key": "skarbiec://BRAMA/agent_auth_secret",
+      "key": "skarbiec://agent:wisent-app/value",
       "model": "any",
-      "_comment": "Brama (org model router) is the ONLY model path. There is no direct provider API code in this package."
+      "_comment": "Brama (org model router) is the ONLY model path. There is no direct provider API code in this package.",
+      "agent_id": "skarbiec://WISENT_APP_AGENT_ID/value"
     }
   },
   "llm": {

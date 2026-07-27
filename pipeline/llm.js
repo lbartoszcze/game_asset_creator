@@ -37,21 +37,32 @@ export function buildCompleter(models = {}, { fetchImpl } = {}) {
   );
 }
 
-/** OpenAI-compatible chat-completions shape (what model routers like Brama speak). */
+/** Brama router shape — HMAC-signed requests (mirrors weles' signedRouterHeaders). */
 function bramaCompleter(cfg, fetch_) {
   const url = `${cfg.url.replace(/\/+$/, '')}/v1/chat/completions`;
   return async function complete({ system, messages, maxTokens = 4096 }) {
+    const bodyStr = JSON.stringify({
+      model: cfg.model ?? 'any',
+      max_tokens: maxTokens,
+      messages: [{ role: 'system', content: system }, ...openAiMessages(messages)],
+    });
+    // x-agent-id + x-agent-timestamp + x-agent-signature =
+    // HMAC-SHA256(agent_auth_secret, "<agentId>:<ts>:<sha256(body)>").
+    const { createHash, createHmac } = await import('node:crypto');
+    const ts = String(Math.floor(Date.now() / 1000));
+    const bodyHash = createHash('sha256').update(bodyStr).digest('hex');
+    const signature = createHmac('sha256', cfg.key)
+      .update(`${cfg.agent_id}:${ts}:${bodyHash}`)
+      .digest('hex');
     const response = await fetch_(url, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        authorization: `Bearer ${cfg.key}`,
+        'x-agent-id': cfg.agent_id,
+        'x-agent-timestamp': ts,
+        'x-agent-signature': signature,
       },
-      body: JSON.stringify({
-        model: cfg.model ?? 'any',
-        max_tokens: maxTokens,
-        messages: [{ role: 'system', content: system }, ...openAiMessages(messages)],
-      }),
+      body: bodyStr,
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
@@ -80,11 +91,44 @@ function openAiMessages(messages) {
 /** Pull the first JSON object out of a model reply (fences / prose tolerated). */
 export function parseJsonFrom(text) {
   const fence = /```(?:json)?\s*(\{[\s\S]*?\})\s*```/.exec(text);
-  const candidate = fence ? fence[1] : text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1);
-  if (!candidate) throw new LlmError(`model reply contained no JSON object: ${text.slice(0, 200)}`);
-  try {
-    return JSON.parse(candidate);
-  } catch (error) {
-    throw new LlmError(`model reply JSON does not parse: ${error.message}`, { cause: error });
+  if (fence) {
+    try {
+      return JSON.parse(fence[1]);
+    } catch (error) {
+      throw new LlmError(`model reply JSON does not parse: ${error.message}`, { cause: error });
+    }
   }
+  // Balanced-brace scan: the model may emit prose, multiple objects, or a
+  // trailing duplicate — take the first object that actually parses.
+  for (let start = text.indexOf('{'); start !== -1; start = text.indexOf('{', start + 1)) {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let i = start; i < text.length; i += 1) {
+      const ch = text[i];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (ch === '\\' && inString) {
+        escaped = true;
+        continue;
+      }
+      if (ch === '"') inString = !inString;
+      if (inString) continue;
+      if (ch === '{') depth += 1;
+      if (ch === '}') {
+        depth -= 1;
+        if (depth === 0) {
+          try {
+            return JSON.parse(text.slice(start, i + 1));
+          } catch {
+            break; // try the next '{' further along
+          }
+        }
+        if (depth < 0) break;
+      }
+    }
+  }
+  throw new LlmError(`model reply contained no JSON object: ${text.slice(0, 200)}`);
 }

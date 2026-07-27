@@ -169,3 +169,10 @@ test('McpStdioClient talks JSON-RPC and unwraps tool results', async () => {
 
   await client.close();
 });
+
+test('skarbiec refs allow colons in item ids (agent:wisent-app)', () => {
+  assert.deepEqual(parseSkarbiecRef('skarbiec://agent:wisent-app/value'), {
+    item: 'agent:wisent-app',
+    field: 'value',
+  });
+});
