@@ -41,12 +41,45 @@ published tarball, which is how a baseline is recovered rather than assumed.
 A module that does not parse raises. It never degrades to a shorter surface,
 because a shrink reads as a breaking removal that never happened.
 
-One caveat this extractor reports rather than hides: package.json maps
-``./sculpt-gear`` to ``./sculpt-gear.js``, which does not exist -- the file
-lives at ``src/sculpt-gear.js``. The specifier is still part of the advertised
-contract, so it is recorded, and the missing target is warned about on stderr.
-The names behind it are reached anyway through the root export, so nothing is
-silently lost.
+WHY A BROKEN SUBPATH IS *NOT* IN THE CONTRACT
+---------------------------------------------
+A ``subpath:`` name is recorded only when its target resolves in the tree being
+read. That is a deliberate choice against the easier reading -- "the exports
+map is the advertised contract, so record every key" -- and this package is the
+reason the choice had to be made rather than assumed.
+
+Measured: ``exports["./sculpt-gear"]`` names ``./sculpt-gear.js`` while the file
+lives at ``src/sculpt-gear.js``. ``npm pack`` ships ``src/sculpt-gear.js`` and no
+root ``sculpt-gear.js``, so ``import 'game_asset_creator/sculpt-gear'`` faults
+for every consumer, in the tree and in any tarball this manifest can produce.
+
+Three edits could be made to that line, and only the resolve-first rule gives
+the right verdict on all three:
+
+  repair the target to ``./src/sculpt-gear.js`` -- a subpath starts working, so
+  the surface grows and the change is additive. Recording the key regardless
+  would call a newly usable entry point ``internal``.
+
+  delete the dead specifier -- nothing a consumer could ever have resolved goes
+  away, so the change is internal. Recording the key regardless would call it
+  breaking and demand a major release for deleting a line that never worked.
+
+  move a *working* module's file, so ``./card-art`` stops resolving. This is the
+  accident the gate exists to catch. Under resolve-first the surface shrinks and
+  the verdict is breaking. Recording the key regardless reads only package.json,
+  which did not change, and reports ``internal`` -- the gate sleeps through a
+  real breakage while looking green. That case decides it.
+
+The same argument covers the ``files`` field: keys recorded blindly make the
+surface a property of the manifest alone, so dropping a directory from ``files``
+and shipping a tarball whose subpaths all fault would also read ``internal``.
+
+So the contract is the subpaths a consumer can actually resolve. The broken one
+is reported loudly on stderr rather than silently dropped, because it is a real
+defect and it is the owner's to fix -- not this extractor's to launder into a
+contract. Nothing is lost from the surface by excluding it: the root export
+re-exports every name from ``./sculpt-gear.js``, so ``api:buildAxe`` and its
+siblings are still recorded through ``subpath:.``.
 """
 
 from __future__ import annotations
@@ -284,17 +317,19 @@ def surface(root: Path, tolerant: bool = False) -> list[str]:
     for specifier, target in exports.items():
         if not isinstance(target, str):
             continue
+        relative = target.removeprefix("./")
+        if not (root / relative).is_file():
+            print(
+                f"warning: package.json maps {specifier!r} to {target!r}, which is not "
+                "in this tree, so an importer writing that specifier faults. It is "
+                "reported here and left out of the surface; this module's docstring "
+                "says why a subpath that cannot resolve is not part of the contract",
+                file=sys.stderr,
+            )
+            continue
         names.add(f"subpath:{specifier}")
-        relative = target.lstrip("./")
         scanned = scan(relative)
-        if scanned is None:
-            if not (root / relative).is_file():
-                print(
-                    f"warning: package.json maps {specifier!r} to {target!r}, which is not "
-                    "in this tree; the specifier is still advertised so it stays in the "
-                    "surface, but the target is broken and an importer would fault",
-                    file=sys.stderr,
-                )
+        if scanned is None:  # tolerant mode skipped it; already recorded above
             continue
         names.update(f"api:{name}" for name in exported_names(scanned[EXIT_OK], relative))
 

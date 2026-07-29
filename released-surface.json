@@ -1,6 +1,6 @@
 {
   "version": "0.1.0",
-  "source": "head:78c379540b1b65b0afd2521aa62bc3a439036c43 nothing is published on npm and the remote carries no tag and no release, so the working revision is the only artifact there is",
+  "source": "head:78ed8d2a3555371e222950ca25b6818b33738a47 nothing is published on npm and the remote carries no tag and no release, so the working revision is the only artifact there is",
   "surface": [
     "api:addBox",
     "api:buildArmorDetails",
@@ -40,7 +40,6 @@
     "subpath:./anatomy",
     "subpath:./card-art",
     "subpath:./loader",
-    "subpath:./sculpt",
-    "subpath:./sculpt-gear"
+    "subpath:./sculpt"
   ]
 }
